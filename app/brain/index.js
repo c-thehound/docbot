@@ -73,44 +73,28 @@ const learn = () => {
                 parse_data
             } = response;
             
-            if (name && name.length > 0) classifier.addDocument(name, entity);
+            if (name && name.length > 0)       classifier.addDocument(name, entity);
             if (caption && caption.length > 0) classifier.addDocument(caption, entity);
-            if (type && type.length > 0) classifier.addDocument(type, entity);
-
-            if (causes && causes.desc) {
-                classifier.addDocument(causes.desc, entity);
-            }
-
-            if (response.symptoms) {
-                const { symptoms } = response;
-                symptoms.map(symptom => classifier.addDocument(symptom, entity));
-            }
+            if (type && type.length > 0)       classifier.addDocument(type, entity);
+            if (causes && causes.desc)         classifier.addDocument(causes.desc, entity);
+            if (response.symptoms)             response.symptoms.map(symptom => classifier.addDocument(symptom, entity));
 
             if (response.prevention) {
                 const { prevention } = response;
-                if (prevention.list) {
-                    prevention.list.map(prev => classifier.addDocument(prev, entity));
-                }
-
-                if (prevention.conditions) {
-                    prevention.conditions.map(cond => classifier.addDocument(cond, entity));
-                }
+                if (prevention.list)        prevention.list.map(prev => classifier.addDocument(prev, entity));
+                if (prevention.conditions)  prevention.conditions.map(cond => classifier.addDocument(cond, entity));
             }
-
+            
             if (response.complications) {
                 const { complications } = response;
-                if (complications.list) {
-                    complications.list.map(comp => classifier.addDocument(comp, entity));
-                }
+                if (complications.list)     complications.list.map(comp => classifier.addDocument(comp, entity));
             }
             
             parse_data.map(datum => {
                 const {text, list} =  datum;
                 classifier.addDocument(text, entity);
                 if (list) {
-                    list.map(el => {
-                        classifier.addDocument(el, entity);
-                    });
+                    list.map(el => classifier.addDocument(el, entity));
                 }
             });
 
