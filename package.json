@@ -15,6 +15,7 @@
     "moment": "^2.20.1",
     "mysql": "^2.15.0",
     "natural": "^0.5.6",
-    "speakeasy-nlp": "^0.2.12"
+    "speakeasy-nlp": "^0.2.12",
+    "wtf_wikipedia": "^2.6.1"
   }
 }

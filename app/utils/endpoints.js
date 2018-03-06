@@ -1,8 +1,15 @@
-exports.base_url = 'https://sandbox-healthservice.priaid.ch/';
-exports.token_auth_url = 'https://sandbox-authservice.priaid.ch/login';
+exports.dev_base_url = 'https://sandbox-healthservice.priaid.ch/';
+exports.prod_base_url = 'https://healthservice.priaid.ch/';
+exports.dev_token_auth_url = 'https://sandbox-authservice.priaid.ch/login';
+exports.prod_token_auth_url = 'https://authservice.priaid.ch/login';
 // TODO: Please fetch this from db or env variables
-exports.auth_details = {
-    username: 'masikapolycarp@gmail.com',
+exports.auth_details_prod = {
+    username: 'polycarp_masika_edu',
+    password: 'C7whm2MDwu4WYHQG',
+}
+
+exports.auth_details_dev = {
+     username: 'masikapolycarp@gmail.com',
     password: 'Pm8q5L3Egw9K4Ayr7',
 }
 

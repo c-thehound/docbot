@@ -1,12 +1,10 @@
 const natural = require('natural');
 const symptoms = require('./symptoms');
 const greetings = require('./greetings');
-const classifier = new natural.BayesClassifier();
-const malaria = require('../entities/malaria/malaria');
+const diseases = require('../entities/index');
 
-const diseases = [
-    malaria
-]
+const classifier = new natural.BayesClassifier();
+
 const trainers = [].concat(
     greetings,
     symptoms,
@@ -45,7 +43,7 @@ for (let disease in diseases) {
 
 classifier.train();
 natural.PorterStemmer.attach();
-const s = 'good afternoon?';
+const s = 'memories dont die';
 let token = s.tokenizeAndStem();
 console.log(classifier.getClassifications(token.join(',')));
 // save the classifier for future use

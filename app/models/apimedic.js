@@ -35,15 +35,15 @@ class APIMedic {
         }
         // create an axios instance that will be used throughout the class
         this.axios = axios.create({
-            baseURL: api_config.base_url,
-            timeout: 1000,
+            baseURL: api_config.prod_base_url,
+            timeout: 5000,
             headers: {
                 'Accept': 'application/json text/plain'
             },
             params: {
                 token: config.token,
                 language: 'en-gb',
-                format: 'json'
+                // format: 'json'
             }
         });
     }
@@ -56,7 +56,20 @@ class APIMedic {
         return this.axios.get(load_symptoms)
             .then(response => response.data)
             .catch(response => {
-                console.log('[post err] failed to get symptoms', response.data);
+                console.log('[post err] failed to get symptoms', response);
+                return response.data;
+            });
+    }
+      /**
+     * Returns a full list of body locations
+     * @returns {Promise<Object>}
+    */
+    get_locations () {
+        const { url_endpoints: { load_body_locations } } = api_config;
+        return this.axios.get(load_body_locations)
+            .then(response => response.data)
+            .catch(response => {
+                console.log('[post err] failed to get locations', response);
                 return response.data;
             });
     }

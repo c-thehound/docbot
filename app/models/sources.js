@@ -1,4 +1,4 @@
-var db = require('../db');
+const db = require('../db');
 /**
  * Insert api source data
  * @param {string} endpoint the url endpoint

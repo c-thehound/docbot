@@ -1,0 +1,1102 @@
+[
+    {
+        "id": 188,
+        "name": "Abdominal guarding"
+    },
+    {
+        "id": 10,
+        "name": "Abdominal pain"
+    },
+    {
+        "id": 223,
+        "name": "Abdominal pain associated with menstruation"
+    },
+    {
+        "id": 984,
+        "name": "Absence of a pulse"
+    },
+    {
+        "id": 974,
+        "name": "Aggressiveness"
+    },
+    {
+        "id": 981,
+        "name": "Agitation"
+    },
+    {
+        "id": 996,
+        "name": "Ankle deformity"
+    },
+    {
+        "id": 147,
+        "name": "Ankle swelling"
+    },
+    {
+        "id": 238,
+        "name": "Anxiety"
+    },
+    {
+        "id": 971,
+        "name": "Arm swelling"
+    },
+    {
+        "id": 998,
+        "name": "Back deformity"
+    },
+    {
+        "id": 104,
+        "name": "Back pain"
+    },
+    {
+        "id": 180,
+        "name": "Black stools"
+    },
+    {
+        "id": 24,
+        "name": "Blackhead"
+    },
+    {
+        "id": 284,
+        "name": "Bleeding from vagina"
+    },
+    {
+        "id": 176,
+        "name": "Bleeding in the conjunctiva of the eye"
+    },
+    {
+        "id": 48,
+        "name": "Bloated feeling in the stomach"
+    },
+    {
+        "id": 190,
+        "name": "Blood in stool"
+    },
+    {
+        "id": 233,
+        "name": "Bloody cough"
+    },
+    {
+        "id": 991,
+        "name": "Blue colored skin"
+    },
+    {
+        "id": 240,
+        "name": "Blue spot on skin"
+    },
+    {
+        "id": 77,
+        "name": "Blurred vision"
+    },
+    {
+        "id": 239,
+        "name": "Bold area among hair on the head"
+    },
+    {
+        "id": 156,
+        "name": "Bone fracture"
+    },
+    {
+        "id": 250,
+        "name": "Breathing-related pains"
+    },
+    {
+        "id": 979,
+        "name": "Brittleness of nails"
+    },
+    {
+        "id": 192,
+        "name": "Bulging abdominal wall"
+    },
+    {
+        "id": 75,
+        "name": "Burning eyes"
+    },
+    {
+        "id": 46,
+        "name": "Burning in the throat"
+    },
+    {
+        "id": 288,
+        "name": "Burning nose"
+    },
+    {
+        "id": 107,
+        "name": "Burning sensation when urinating"
+    },
+    {
+        "id": 91,
+        "name": "Changes in the nails"
+    },
+    {
+        "id": 170,
+        "name": "Cheek swelling"
+    },
+    {
+        "id": 17,
+        "name": "Chest pain"
+    },
+    {
+        "id": 31,
+        "name": "Chest tightness"
+    },
+    {
+        "id": 175,
+        "name": "Chills"
+    },
+    {
+        "id": 218,
+        "name": "Coarsening of the skin structure"
+    },
+    {
+        "id": 89,
+        "name": "Cold feet"
+    },
+    {
+        "id": 978,
+        "name": "Cold hands"
+    },
+    {
+        "id": 139,
+        "name": "Cold sweats"
+    },
+    {
+        "id": 15,
+        "name": "Cough"
+    },
+    {
+        "id": 228,
+        "name": "Cough with sputum"
+    },
+    {
+        "id": 94,
+        "name": "Cramps"
+    },
+    {
+        "id": 49,
+        "name": "Cravings"
+    },
+    {
+        "id": 134,
+        "name": "Crusting"
+    },
+    {
+        "id": 260,
+        "name": "Curvature of the spine"
+    },
+    {
+        "id": 108,
+        "name": "Dark urine"
+    },
+    {
+        "id": 163,
+        "name": "Decreased urine stream"
+    },
+    {
+        "id": 165,
+        "name": "Delayed start to urination"
+    },
+    {
+        "id": 50,
+        "name": "Diarrhea"
+    },
+    {
+        "id": 79,
+        "name": "Difficult defecation"
+    },
+    {
+        "id": 126,
+        "name": "Difficulty in finding words"
+    },
+    {
+        "id": 98,
+        "name": "Difficulty in speaking"
+    },
+    {
+        "id": 93,
+        "name": "Difficulty in swallowing"
+    },
+    {
+        "id": 53,
+        "name": "Difficulty to concentrate"
+    },
+    {
+        "id": 1007,
+        "name": "Difficulty to learn"
+    },
+    {
+        "id": 1005,
+        "name": "Difficulty with gait"
+    },
+    {
+        "id": 216,
+        "name": "Discoloration of nails"
+    },
+    {
+        "id": 128,
+        "name": "Disorientation regarding time or place"
+    },
+    {
+        "id": 989,
+        "name": "Distended abdomen"
+    },
+    {
+        "id": 207,
+        "name": "Dizziness"
+    },
+    {
+        "id": 71,
+        "name": "Double vision"
+    },
+    {
+        "id": 270,
+        "name": "Double vision, acute-onset"
+    },
+    {
+        "id": 162,
+        "name": "Dribbling after urination"
+    },
+    {
+        "id": 244,
+        "name": "Drooping eyelid"
+    },
+    {
+        "id": 273,
+        "name": "Dry eyes"
+    },
+    {
+        "id": 272,
+        "name": "Dry mouth"
+    },
+    {
+        "id": 151,
+        "name": "Dry skin"
+    },
+    {
+        "id": 87,
+        "name": "Earache"
+    },
+    {
+        "id": 92,
+        "name": "Early satiety"
+    },
+    {
+        "id": 1006,
+        "name": "Enlarged calf"
+    },
+    {
+        "id": 242,
+        "name": "Eye blinking"
+    },
+    {
+        "id": 208,
+        "name": "Eye lid swelling"
+    },
+    {
+        "id": 209,
+        "name": "Eye lids sticking together"
+    },
+    {
+        "id": 287,
+        "name": "Eye pain"
+    },
+    {
+        "id": 33,
+        "name": "Eye redness"
+    },
+    {
+        "id": 219,
+        "name": "Face pain"
+    },
+    {
+        "id": 246,
+        "name": "Facial paralysis"
+    },
+    {
+        "id": 970,
+        "name": "Facial swelling"
+    },
+    {
+        "id": 153,
+        "name": "Fast, deepened breathing"
+    },
+    {
+        "id": 83,
+        "name": "Fatty defecation"
+    },
+    {
+        "id": 982,
+        "name": "Feeling faint"
+    },
+    {
+        "id": 76,
+        "name": "Feeling of foreign body in the eye"
+    },
+    {
+        "id": 86,
+        "name": "Feeling of pressure in the ear"
+    },
+    {
+        "id": 164,
+        "name": "Feeling of residual urine"
+    },
+    {
+        "id": 145,
+        "name": "Feeling of tension in the legs"
+    },
+    {
+        "id": 11,
+        "name": "Fever"
+    },
+    {
+        "id": 995,
+        "name": "Finger deformity"
+    },
+    {
+        "id": 214,
+        "name": "Flaking skin"
+    },
+    {
+        "id": 245,
+        "name": "Flaking skin on the head"
+    },
+    {
+        "id": 154,
+        "name": "Flatulence"
+    },
+    {
+        "id": 255,
+        "name": "Foot pain"
+    },
+    {
+        "id": 1002,
+        "name": "Foot swelling"
+    },
+    {
+        "id": 125,
+        "name": "Forgetfulness"
+    },
+    {
+        "id": 62,
+        "name": "Formation of blisters on a skin area"
+    },
+    {
+        "id": 84,
+        "name": "Foul smelling defecation"
+    },
+    {
+        "id": 59,
+        "name": "Frequent urination"
+    },
+    {
+        "id": 110,
+        "name": "Genital warts"
+    },
+    {
+        "id": 57,
+        "name": "Going black before the eyes"
+    },
+    {
+        "id": 152,
+        "name": "Hair loss"
+    },
+    {
+        "id": 976,
+        "name": "Hallucination"
+    },
+    {
+        "id": 72,
+        "name": "Halo"
+    },
+    {
+        "id": 186,
+        "name": "Hand pain"
+    },
+    {
+        "id": 148,
+        "name": "Hand swelling"
+    },
+    {
+        "id": 80,
+        "name": "Hard defecation"
+    },
+    {
+        "id": 184,
+        "name": "Hardening of the skin"
+    },
+    {
+        "id": 9,
+        "name": "Headache"
+    },
+    {
+        "id": 206,
+        "name": "Hearing loss"
+    },
+    {
+        "id": 985,
+        "name": "Heart murmur"
+    },
+    {
+        "id": 45,
+        "name": "Heartburn"
+    },
+    {
+        "id": 122,
+        "name": "Hiccups"
+    },
+    {
+        "id": 993,
+        "name": "Hip deformity"
+    },
+    {
+        "id": 196,
+        "name": "Hip pain"
+    },
+    {
+        "id": 121,
+        "name": "Hoarseness"
+    },
+    {
+        "id": 149,
+        "name": "Hot flushes"
+    },
+    {
+        "id": 197,
+        "name": "Immobilization"
+    },
+    {
+        "id": 120,
+        "name": "Impaired balance"
+    },
+    {
+        "id": 90,
+        "name": "Impaired hearing"
+    },
+    {
+        "id": 70,
+        "name": "Impaired light-dark adaptation"
+    },
+    {
+        "id": 113,
+        "name": "Impairment of male potency"
+    },
+    {
+        "id": 81,
+        "name": "Incomplete defecation"
+    },
+    {
+        "id": 131,
+        "name": "Increased appetite"
+    },
+    {
+        "id": 262,
+        "name": "Increased drive"
+    },
+    {
+        "id": 204,
+        "name": "Increased salivation"
+    },
+    {
+        "id": 40,
+        "name": "Increased thirst"
+    },
+    {
+        "id": 220,
+        "name": "Increased touch sensitivity"
+    },
+    {
+        "id": 39,
+        "name": "Increased urine quantity"
+    },
+    {
+        "id": 257,
+        "name": "Involuntary movements"
+    },
+    {
+        "id": 986,
+        "name": "Irregular heartbeat"
+    },
+    {
+        "id": 65,
+        "name": "Irregular mole"
+    },
+    {
+        "id": 73,
+        "name": "Itching eyes"
+    },
+    {
+        "id": 88,
+        "name": "Itching in the ear"
+    },
+    {
+        "id": 973,
+        "name": "Itching in the mouth or throat"
+    },
+    {
+        "id": 96,
+        "name": "Itching in the nose"
+    },
+    {
+        "id": 21,
+        "name": "Itching of skin"
+    },
+    {
+        "id": 999,
+        "name": "Itching of the anus"
+    },
+    {
+        "id": 247,
+        "name": "Itching on head"
+    },
+    {
+        "id": 268,
+        "name": "Itching or burning in the genital area"
+    },
+    {
+        "id": 194,
+        "name": "Joint effusion"
+    },
+    {
+        "id": 198,
+        "name": "Joint instability"
+    },
+    {
+        "id": 27,
+        "name": "Joint pain"
+    },
+    {
+        "id": 230,
+        "name": "Joint redness"
+    },
+    {
+        "id": 193,
+        "name": "Joint swelling"
+    },
+    {
+        "id": 47,
+        "name": "Joylessness"
+    },
+    {
+        "id": 994,
+        "name": "Knee deformity"
+    },
+    {
+        "id": 256,
+        "name": "Knee pain"
+    },
+    {
+        "id": 146,
+        "name": "Leg cramps"
+    },
+    {
+        "id": 231,
+        "name": "Leg swelling"
+    },
+    {
+        "id": 143,
+        "name": "Leg ulcer"
+    },
+    {
+        "id": 82,
+        "name": "Less than 3 defecations per week"
+    },
+    {
+        "id": 992,
+        "name": "Limited mobility of the ankle"
+    },
+    {
+        "id": 167,
+        "name": "Limited mobility of the back"
+    },
+    {
+        "id": 178,
+        "name": "Limited mobility of the fingers"
+    },
+    {
+        "id": 1000,
+        "name": "Limited mobility of the hip"
+    },
+    {
+        "id": 195,
+        "name": "Limited mobility of the leg"
+    },
+    {
+        "id": 35,
+        "name": "Lip swelling"
+    },
+    {
+        "id": 205,
+        "name": "Lockjaw"
+    },
+    {
+        "id": 210,
+        "name": "Loss of eye lashes"
+    },
+    {
+        "id": 174,
+        "name": "Lower abdominal pain"
+    },
+    {
+        "id": 263,
+        "name": "Lower-back pain"
+    },
+    {
+        "id": 261,
+        "name": "Lump in the breast"
+    },
+    {
+        "id": 266,
+        "name": "Malposition of the testicles"
+    },
+    {
+        "id": 232,
+        "name": "Marked veins"
+    },
+    {
+        "id": 235,
+        "name": "Memory gap"
+    },
+    {
+        "id": 112,
+        "name": "Menstruation disorder"
+    },
+    {
+        "id": 123,
+        "name": "Missed period"
+    },
+    {
+        "id": 215,
+        "name": "Moist and softened skin"
+    },
+    {
+        "id": 85,
+        "name": "Mood swings"
+    },
+    {
+        "id": 983,
+        "name": "Morning stiffness"
+    },
+    {
+        "id": 135,
+        "name": "Mouth pain"
+    },
+    {
+        "id": 97,
+        "name": "Mouth ulcers"
+    },
+    {
+        "id": 177,
+        "name": "Muscle pain"
+    },
+    {
+        "id": 119,
+        "name": "Muscle stiffness"
+    },
+    {
+        "id": 987,
+        "name": "Muscle weakness"
+    },
+    {
+        "id": 252,
+        "name": "Muscular atrophy in the leg"
+    },
+    {
+        "id": 202,
+        "name": "Muscular atrophy of the arm"
+    },
+    {
+        "id": 168,
+        "name": "Muscular weakness in the arm"
+    },
+    {
+        "id": 253,
+        "name": "Muscular weakness in the leg"
+    },
+    {
+        "id": 44,
+        "name": "Nausea"
+    },
+    {
+        "id": 136,
+        "name": "Neck pain"
+    },
+    {
+        "id": 114,
+        "name": "Nervousness"
+    },
+    {
+        "id": 133,
+        "name": "Night cough"
+    },
+    {
+        "id": 1004,
+        "name": "Night sweats"
+    },
+    {
+        "id": 63,
+        "name": "Non-healing skin wound"
+    },
+    {
+        "id": 38,
+        "name": "Nosebleed"
+    },
+    {
+        "id": 221,
+        "name": "Numbness in the arm"
+    },
+    {
+        "id": 254,
+        "name": "Numbness in the leg"
+    },
+    {
+        "id": 200,
+        "name": "Numbness of the hands"
+    },
+    {
+        "id": 137,
+        "name": "Oversensitivity to light"
+    },
+    {
+        "id": 157,
+        "name": "Overweight"
+    },
+    {
+        "id": 155,
+        "name": "Pain in the bones"
+    },
+    {
+        "id": 142,
+        "name": "Pain in the calves"
+    },
+    {
+        "id": 12,
+        "name": "Pain in the limbs"
+    },
+    {
+        "id": 990,
+        "name": "Pain of the anus"
+    },
+    {
+        "id": 203,
+        "name": "Pain on swallowing"
+    },
+    {
+        "id": 251,
+        "name": "Pain radiating to the arm"
+    },
+    {
+        "id": 103,
+        "name": "Pain radiating to the leg"
+    },
+    {
+        "id": 286,
+        "name": "Pain when chewing"
+    },
+    {
+        "id": 189,
+        "name": "Painful defecation"
+    },
+    {
+        "id": 109,
+        "name": "Painful urination"
+    },
+    {
+        "id": 150,
+        "name": "Pallor"
+    },
+    {
+        "id": 37,
+        "name": "Palpitations"
+    },
+    {
+        "id": 140,
+        "name": "Paralysis"
+    },
+    {
+        "id": 118,
+        "name": "Physical inactivity"
+    },
+    {
+        "id": 129,
+        "name": "Problems with the sense of touch in the face"
+    },
+    {
+        "id": 130,
+        "name": "Problems with the sense of touch in the feet"
+    },
+    {
+        "id": 258,
+        "name": "Protrusion of the eyes"
+    },
+    {
+        "id": 172,
+        "name": "Purulent discharge from the urethra"
+    },
+    {
+        "id": 173,
+        "name": "Purulent discharge from the vagina"
+    },
+    {
+        "id": 191,
+        "name": "Rebound tenderness"
+    },
+    {
+        "id": 54,
+        "name": "Reduced appetite"
+    },
+    {
+        "id": 78,
+        "name": "Ringing in the ear"
+    },
+    {
+        "id": 14,
+        "name": "Runny nose"
+    },
+    {
+        "id": 975,
+        "name": "Sadness"
+    },
+    {
+        "id": 269,
+        "name": "Scalp redness"
+    },
+    {
+        "id": 1001,
+        "name": "Scar"
+    },
+    {
+        "id": 60,
+        "name": "Sensitivity to cold"
+    },
+    {
+        "id": 69,
+        "name": "Sensitivity to glare"
+    },
+    {
+        "id": 102,
+        "name": "Sensitivity to noise"
+    },
+    {
+        "id": 264,
+        "name": "Shiny red tongue"
+    },
+    {
+        "id": 29,
+        "name": "Shortness of breath"
+    },
+    {
+        "id": 183,
+        "name": "Side pain"
+    },
+    {
+        "id": 26,
+        "name": "Skin lesion"
+    },
+    {
+        "id": 25,
+        "name": "Skin nodules"
+    },
+    {
+        "id": 124,
+        "name": "Skin rash"
+    },
+    {
+        "id": 61,
+        "name": "Skin redness"
+    },
+    {
+        "id": 217,
+        "name": "Skin thickening"
+    },
+    {
+        "id": 34,
+        "name": "Skin wheal"
+    },
+    {
+        "id": 241,
+        "name": "Sleepiness with spontaneous falling asleep"
+    },
+    {
+        "id": 52,
+        "name": "Sleeplessness"
+    },
+    {
+        "id": 95,
+        "name": "Sneezing"
+    },
+    {
+        "id": 13,
+        "name": "Sore throat"
+    },
+    {
+        "id": 64,
+        "name": "Sputum"
+    },
+    {
+        "id": 234,
+        "name": "Stiff neck"
+    },
+    {
+        "id": 179,
+        "name": "Stomach burning"
+    },
+    {
+        "id": 185,
+        "name": "Stress-related leg pain"
+    },
+    {
+        "id": 28,
+        "name": "Stuffy nose"
+    },
+    {
+        "id": 43,
+        "name": "Stupor"
+    },
+    {
+        "id": 138,
+        "name": "Sweating"
+    },
+    {
+        "id": 236,
+        "name": "Swelling in the genital area"
+    },
+    {
+        "id": 267,
+        "name": "Swelling of the testicles"
+    },
+    {
+        "id": 248,
+        "name": "Swollen glands in the armpits"
+    },
+    {
+        "id": 249,
+        "name": "Swollen glands in the groin"
+    },
+    {
+        "id": 169,
+        "name": "Swollen glands on the neck"
+    },
+    {
+        "id": 211,
+        "name": "Tears"
+    },
+    {
+        "id": 222,
+        "name": "Testicular pain"
+    },
+    {
+        "id": 243,
+        "name": "Tick"
+    },
+    {
+        "id": 201,
+        "name": "Tingling"
+    },
+    {
+        "id": 16,
+        "name": "Tiredness"
+    },
+    {
+        "id": 997,
+        "name": "Toe deformity"
+    },
+    {
+        "id": 1003,
+        "name": "Toe swelling"
+    },
+    {
+        "id": 980,
+        "name": "Tongue burning"
+    },
+    {
+        "id": 977,
+        "name": "Tongue swelling"
+    },
+    {
+        "id": 1008,
+        "name": "Toothache"
+    },
+    {
+        "id": 115,
+        "name": "Tremor at rest"
+    },
+    {
+        "id": 132,
+        "name": "Tremor on movement"
+    },
+    {
+        "id": 988,
+        "name": "Trouble understanding speech"
+    },
+    {
+        "id": 144,
+        "name": "Unconsciousness, short"
+    },
+    {
+        "id": 265,
+        "name": "Uncontrolled defecation"
+    },
+    {
+        "id": 116,
+        "name": "Underweight"
+    },
+    {
+        "id": 160,
+        "name": "Urge to urinate"
+    },
+    {
+        "id": 161,
+        "name": "Urination during the night"
+    },
+    {
+        "id": 68,
+        "name": "Vision impairment"
+    },
+    {
+        "id": 213,
+        "name": "Vision impairment for far objects"
+    },
+    {
+        "id": 166,
+        "name": "Vision impairment for near objects"
+    },
+    {
+        "id": 66,
+        "name": "Visual field loss"
+    },
+    {
+        "id": 101,
+        "name": "Vomiting"
+    },
+    {
+        "id": 181,
+        "name": "Vomiting blood"
+    },
+    {
+        "id": 972,
+        "name": "Weakness or numbness on right or left side of body"
+    },
+    {
+        "id": 23,
+        "name": "Weight gain"
+    },
+    {
+        "id": 22,
+        "name": "Weight loss"
+    },
+    {
+        "id": 30,
+        "name": "Wheezing"
+    },
+    {
+        "id": 187,
+        "name": "Wound"
+    },
+    {
+        "id": 105,
+        "name": "Yellow colored skin"
+    },
+    {
+        "id": 106,
+        "name": "Yellowish discoloration of the white part of the eye"
+    }
+]

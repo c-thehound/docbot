@@ -9,25 +9,27 @@ const sources = require('./models/sources');
  * @returns {Promise<AXIOS.XHR>}
 */
 const get_token = () => {
-    const { token_auth_url, auth_details } = endpoints;
-    const computedHash = crypto.createHmac('md5', auth_details.password).update(token_auth_url).digest('base64');
+    const { prod_token_auth_url, auth_details_prod } = endpoints;
+    const computedHash = crypto.createHmac('md5', auth_details_prod.password).update(prod_token_auth_url).digest('base64');
     // send request
     const headers = {
-        'Authorization': `Bearer ${auth_details.username}:${computedHash}`,
+        'Authorization': `Bearer ${auth_details_prod.username}:${computedHash}`,
         'Content-Type': 'application/json'
     }
+
+    console.log(headers);
     //
     return axios({
         method: 'POST',
         headers,
-        url: token_auth_url,
+        url: prod_token_auth_url,
         responseType: 'json'
     })
     .then(result => result.data)
     .catch(error => {
         const response = error.response;
         const { status, statusText, data } = response;
-        console.log('[token_get_error]', status, statusText, authServiceUrl);
+        console.log('[token_get_error]', status, statusText, prod_token_auth_url);
         return {
             status,
             statusText,
@@ -46,7 +48,7 @@ const update_or_save_token = (source_id) => {
         // update previos token
         if (source_id) {
             return sources.update_source(
-                id,
+                source_id,
                 {
                     token: response.Token,
                     expires: response.ValidThrough

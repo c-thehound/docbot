@@ -1,5 +1,3 @@
-const malaria = require('../entities/malaria/malaria');
-const malaria_symptoms = malaria.symptoms;
 const intent = 'symptoms';
 const expressions = [
     "sick",
