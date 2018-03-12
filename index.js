@@ -4,24 +4,33 @@
  * @author pozy<masikapolycarp@gmail.com>
  */
 const express = require('express');
-const bodyparser = require('body-parser');
 const config = require('./config');
 const tokens = require('./app/tokens');
 const source_model = require('./app/models/sources')
 const api_medic_model = require('./app/models/apimedic');
 const wikipedia_model = require('./app/models/wikipedia');
-const brain = require('./app/brain/index');
+const brain = require('./app/brain/brain');
 const wiki = new wikipedia_model();
 
 const app = express();
-app.use(bodyparser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+app.post('/webhook', (req, res) => {
+    brain.process_input(req, res).then(data => res.send(data));
+});
 // crawls all our data sources
 // use this to test this functionality
 app.post('/crawl', (req, res) => {
     brain.crawl()
     .then(responses => {
         res.send(responses);
+    });
+});
+
+app.post('/question_generator', (req, res) => {
+    brain.all_questions().then(data => {
+        res.send(data);
     });
 });
 

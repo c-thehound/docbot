@@ -31,12 +31,12 @@ exports.update_or_save_entity = (entity_name, entity_values = {}) => {
  * Get an entity
  * @param {string} filter_key - where key
  * @param {string} filter_value - value
- * @param {string} select_text - what will be selected from db
+ * @param {Array[string]} select_list - what will be selected from db
  * @returns {Promise<any>}
  */
-exports.load_entity = (filter_key = '', filter_value = '', select_text = '*') => {
+exports.load_entity = (filter_key = '', filter_value = '', select_list = []) => {
    if (filter_key.length > 0 && filter_value.length > 0) {
-        return db.select(select_text)
+        return db.select(...select_list)
             .from(table_name)
             .where(filter_key, filter_value)
             .then(response => {
@@ -44,5 +44,5 @@ exports.load_entity = (filter_key = '', filter_value = '', select_text = '*') =>
                 return response[0];
             })
     }
-    return db.select(select_text).from(table_name);
+    return db.select(select_list).from(table_name);
 }
