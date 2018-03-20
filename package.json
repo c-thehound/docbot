@@ -20,5 +20,8 @@
     "speakeasy-nlp": "^0.2.12",
     "uuid": "^3.2.1",
     "wtf_wikipedia": "^2.6.1"
+  },
+  "devDependencies": {
+    "ngrok": "^3.0.1"
   }
 }

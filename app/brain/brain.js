@@ -1,10 +1,9 @@
 /**
  * DocBot's brain
  * Use the data gathering sources and classifiers to build the bots brain
+ * @author Pozy <masikapolycarp@gmail.com>
 */
 const natural = require('natural');
-const diseases = require('../utils/supported_illnesses');
-const Wikipedia = require('../models/wikipedia');
 const classifier_model = require('../models/classifier');
 const generate_questions = require('./question_generator');
 const process_input = require('./process_input');
@@ -14,9 +13,10 @@ const crawl_persist = require('./crawl_persist');
 const learn_and_train = require('./learn');
 const _ = require('lodash');
 
-const wiki_bot = new Wikipedia();
-
-
+/**
+ * Get all questions from all entitites
+ * Use this to test this functionality
+ */
 const all_questions = () => {
     return entity_model.load_entity('', '', ['id', 'entity', 'symptoms'])
         .then(responses => {

@@ -21,8 +21,14 @@ class Wikipedia {
                     // generate a slug to be used as entity during nlp
                     entity: condition_title.toLocaleLowerCase().replace(/\s+/g, '_'),
                     parse_data: [],
+                    images: []
                 };
-                const { infoboxes, sections } = data;
+                const { infoboxes, sections, images} = data;
+                good(data);
+                if (images) {
+                    parsed_response.images = images;
+                }
+
                 if (infoboxes) {
                     infoboxes.map(info => {
                         const { data } = info;

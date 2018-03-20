@@ -1,3 +1,6 @@
+const Wikipedia = require('../models/wikipedia');
+const diseases = require('../utils/supported_illnesses');
+const wiki_bot = new Wikipedia();
 /**
  * Fetch disease data fro wikipedia
 */

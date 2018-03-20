@@ -8,18 +8,21 @@ const generate_question = require('./question_generator');
 const entity_model = require('../models/entity');
 const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
+const fb_send_message = require('./send_facebook_message');
+const fb_upload_image = require('./upload_facebook_image');
+
 /**
  * Process user input
- * @param {Object} req - express request object
+ * @param {Object} webhook_event - Facebook messenger webhook event
  */
-module.exports = async function (req) {
-    const { user_id, message } = req.body;
-    let user_data = await get_data(user_id);
+module.exports = async function (webhook_event) {
+    const { sender: { id }, message, postback } = webhook_event;
+    let user_data = await get_data(id);
     if (user_data === null) {
-        const save_status = await save_data(user_id, '{}');
+        const save_status = await save_data(id, '{}');
     }
 
-    let analysis = await analyze_input(user_id, user_data, message);
+    let analysis = await analyze_input(id, user_data, message || postback);
     return analysis;
 }
 
@@ -27,85 +30,251 @@ module.exports = async function (req) {
  * Analyzes user's input to determine correct response
  * @param {string} user_id - the user's unique identifier
  * @param {Object} user_obj - redis cached object
- * @param {string} input - what the user typed in 
+ * @param {string | object} input - what the user typed in 
  */
 async function analyze_input (user_id, user_obj, input) {
-    const specific_class = await text_classifier.classify_text(input);
     let user_data = JSON.parse(user_obj);
-    if (specific_class === greetings.intent) {
-        // respond with something witty here
-        const response = _.sample(responses.greetings);
-        return {
-            response
-        }
-    }
-    // respond to other things
-    if (
-        !user_data||
-        !user_data.symptom_questions
-    ) {
-        const classifications = await text_classifier.get_classifications(input);
-        // choose top 5 entitites from response
-        // _.sortyBy returns an ascending array
-        const top_intents = _.sortBy(classifications, ['value']).reverse().slice(0, 5);
-        const labels = _.map(top_intents, i => i.label);
-        const symptom_questions = await get_entity_questions(labels);
-        // save this to cache
-        const data = _.assign({}, user_data, {
-            symptom_questions,
-            classifications: top_intents,
+    // payload is usually the user's response when asked a question
+    if (input.payload) {
+        const payload = JSON.parse(input.payload);
+        // this will be cached for later analysis
+        let current_question = {};
+        const updated_questions = _.map(user_data.symptom_questions, (entity_object) => {
+            let { entity, questions } = entity_object;
+
+            if (entity = payload.entity) {
+                questions = questions.map(question => {
+                    if (question.id === payload.question_id) {
+                        asked_questions.push(question);
+                        const q = _.assign({}, question, { asked: true, score: payload.succeeded ? 1 : 0 });
+                        current_question = q;
+                        return q;
+                    }
+
+                    return question;
+                });
+            }
+            // this is just the modified entity_object
+            return {
+                entity,
+                questions
+            };
         });
-        const save = await save_data(user_id, JSON.stringify(data));
-        user_data = data;
+
+        user_data = _.assign({}, user_data, {
+            symptom_questions: updated_questions,
+            answers: user_data.answers.concat(current_question)
+        });
+
+    } else {
+        // respond to user answers
+        const { text } = input;
+        const specific_class = await text_classifier.classify_text(text);
+
+        if (specific_class === greetings.intent) {
+            // greet user here
+            const response = {
+                "text": _.sample(responses.greetings)
+            };
+            return fb_send_message(user_id, response);
+        }
+
+        // reset cache command
+        if (text === '/start') {
+            const save_status = await save_data(user_id, '{}');
+            return fb_send_message(user_id, {
+                "text": "Reseting question cache..."
+            });
+        }
+
+        // respond to other things
+        if (
+            !user_data ||
+            !user_data.symptom_questions
+        ) {
+            const classifications = await text_classifier.get_classifications(text);
+            // choose top 5 entitites from response
+            // _.sortyBy returns an ascending array
+            const top_intents = _.sortBy(classifications, ['value']).reverse().slice(0, 5);
+            const labels = _.map(top_intents, i => i.label);
+            const symptom_questions = await get_entity_questions(labels);
+            // a group of questions to ask user
+            const ui_questions = [];
+
+            _.forEach(symptom_questions, (entity_object) => {
+                const { entity, questions } = entity_object;
+
+                if (questions.length > 0) {
+                    // don't repeat the same questions
+                    const unasked = _.filter(questions, q => !q.asked);
+                    if (unasked.length > 0) {
+                        // take 2 questions
+                        // TODO: Is this enough
+                        const samples = _.sampleSize(unasked, 2);
+                        samples.map(q => ui_questions.push(q));
+                    }
+                }
+
+            });
+            // save this to cache
+
+            let data = _.assign({}, user_data, {
+                symptom_questions,
+                classifications: top_intents,
+                answers: []
+            });
+
+            if (!user_data.cached_questions) {
+                data.cached_questions = ui_questions;
+            }
+
+            const save = await save_data(user_id, JSON.stringify(data));
+            user_data = data;
+        }
     }
 
-    const { symptom_questions, classifications } = user_data;
-    const ui_questions = [];
+    const { symptom_questions, classifications, cached_questions } = user_data;
+    // select the top most question and ask user
+    // console.log(cached_questions);
+    const question = cached_questions.shift();
+    let response = null;
 
-    _.forEach(symptom_questions, (entity_object) => {
-        const { entity, questions } = entity_object;
-        if (questions.length > 0) {
-            // don't repeat the same questions
-            const unasked = _.filter(questions, q => !q.asked);
-            ui_questions.push(_.sample(unasked));
+    if (question) {
+        response = {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "button",
+                    "text": question.question,
+                    "buttons": [
+                        {
+                            "type": "postback",
+                            "title": "Yes",
+                            // this payload is important to track subsequent requests
+                            "payload": JSON.stringify({
+                                "question_id": question.id,
+                                "succeeded": true,
+                                "entity": question.entity
+                            })
+                        },
+                        {
+                            "type": "postback",
+                            "title": "No",
+                            "payload": JSON.stringify({
+                                "question_id": question.id,
+                                "succeeded": false,
+                                "entity": question.entity
+                            })
+                        }
+                    ]
+                }
+            }
+        };
+
+    } else {
+        // if here it means we are done with acquiring information and shoud now process requests
+        const promises = [
+            fb_send_message(user_id, {
+                "text": "That is enough for now"
+            }),
+            fb_send_message(user_id, {
+                "text": "Let me try and see if i can identify the problem"
+            }),
+        ];
+        await Promise.all(promises);
+        // time to score the responses
+        const { answers } = user_data;
+        const scores = {};
+        answers.map(answer => {
+            scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
+        });
+        
+        let sorted_scores =_.chain(scores)
+            .map((val, key) => {
+                return { entity: key, score: val }
+            })
+            .sortBy(['score'])
+            .reverse()
+            .value();
+
+        const first = sorted_scores[0];
+        const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data']);
+        let { name } = entity_data;
+        name = unescape(name);
+        const images = JSON.parse(entity_data.images);
+        const extra = JSON.parse(entity_data.parse_data);
+        const info = extra[0].text;
+        const chunked_messages = info.split('.');
+        const chunked_promises = [];
+        // tell diagnosis
+        await fb_send_message(user_id, {
+            "text": `From my calculations, it is highly possible that you have ${ name }.`
+        });
+        // maybe tell the user what the disease looks like?
+        if (images.length > 0) {
+            await fb_send_message(user_id, {
+                "text": `Here's what ${name} looks like`
+            });
+            await fb_upload_image(user_id, images[0].url);
         }
-    });
+        // just in case the description is long chunk it into sentences
+        chunked_messages.map(message => {
+            if (message.length > 0) {
+                chunked_promises.push(
+                    fb_send_message(user_id, {
+                        "text": message
+                    })
+                )
+            }
+        });
 
-    // select the first valid question and ask the user
-    const question = _.head(ui_questions);
-
-    return {
-        user_id,
-        input,
-       question: question.question,
-       classifications
+        await Promise.all(chunked_promises);
     };
+
+    // persist our state
+    const save_status = await save_data(user_id, JSON.stringify(user_data));
+
+    if (response) {
+        await fb_send_message(user_id, response);
+    }
 }
 
+/**
+ * Takes an entity list and throws out all questions for the entitites
+ * @param {Array} entities the list of entities
+ * @returns {Array}
+ */
 async function get_entity_questions (entities = []) {
     const questions = [];
 
     for (let entity in entities) {
         const data = await entity_model.load_entity('entity', entities[entity], ['id', 'entity', 'symptoms']);
-        const generated = generate_question(JSON.parse(data.symptoms));
-        const formatted = {
-            entity: entities[entity],
-            questions: _.map(generated, qs => {
-                return {
-                    question: qs,
-                    id: entities[entity] + '_' + uuidv4(),
-                    asked: false,
-                    score: 0
-                };
-            })
+        if (data && data.symptoms) {
+            const generated = generate_question(JSON.parse(data.symptoms));
+            const formatted = {
+                entity: entities[entity],
+                questions: _.map(generated, qs => {
+                    return {
+                        question: qs,
+                        entity: entities[entity],
+                        id: entities[entity] + '_' + uuidv4(),
+                        asked: false,
+                        score: 0
+                    };
+                })
+            }
+        
+            questions.push(formatted);
         }
-       
-        questions.push(formatted);
     }
 
     return questions;
 }
 
+/**
+ * Get saved details from redis cache
+ * @param {*} user_id unique user identifier
+ */
 const get_data = (user_id) => {
     console.info('[redis] get data');
     return new Promise ((good, bad) => {
@@ -116,6 +285,11 @@ const get_data = (user_id) => {
     });
 }
 
+/**
+ * Save user data to reds cache
+ * @param {string} user_id unique user identifier
+ * @param {JSON} data json encode string to be saved (JSON.stringify(data))
+ */
 const save_data = (user_id, data = '') => {
     return new Promise ((good, bad) => {
         console.info('[redis] save data');
