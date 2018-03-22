@@ -8,9 +8,11 @@ const generate_question = require('./question_generator');
 const entity_model = require('../models/entity');
 const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
-const fb_send_message = require('./send_facebook_message');
-const fb_upload_image = require('./upload_facebook_image');
-
+const fb_send_message = require('./facebook/send_message');
+const fb_upload_image = require('./facebook/upload_image');
+const fb_update_home_screen = require('./facebook/profile');
+const is_emoji = require('./facebook/detect_emoji');
+const commands = require('../entities/commands');
 /**
  * Process user input
  * @param {Object} webhook_event - Facebook messenger webhook event
@@ -34,6 +36,11 @@ module.exports = async function (webhook_event) {
  */
 async function analyze_input (user_id, user_obj, input) {
     let user_data = JSON.parse(user_obj);
+
+    if (config.FB_HOME_SCREEN_SET) {
+        await fb_update_home_screen();
+    }
+
     // payload is usually the user's response when asked a question
     if (input.payload) {
         const payload = JSON.parse(input.payload);
@@ -45,7 +52,6 @@ async function analyze_input (user_id, user_obj, input) {
             if (entity = payload.entity) {
                 questions = questions.map(question => {
                     if (question.id === payload.question_id) {
-                        asked_questions.push(question);
                         const q = _.assign({}, question, { asked: true, score: payload.succeeded ? 1 : 0 });
                         current_question = q;
                         return q;
@@ -68,24 +74,55 @@ async function analyze_input (user_id, user_obj, input) {
 
     } else {
         // respond to user answers
-        const { text } = input;
-        const specific_class = await text_classifier.classify_text(text);
-
-        if (specific_class === greetings.intent) {
+        const { text, nlp } = input;
+        const start_command = _.find(commands, c => c.name === 'restart');
+        // recognise basic text meanings such as thank you messages
+        const greetings = await text_classifier.classify_text(text) === 'greetings';
+        if (greetings) {
+            // greet the user back
             // greet user here
-            const response = {
+            return fb_send_message(user_id, {
                 "text": _.sample(responses.greetings)
-            };
-            return fb_send_message(user_id, response);
+            });
         }
 
         // reset cache command
-        if (text === '/start') {
+        const matches_command = _.filter(start_command.messages, message => {
+            return text && text_classifier.close_enough(message, text);
+        });
+
+        if (matches_command.length > 0) {
+            // if i don't have any data on user, ignore the reset command
+            if (!user_data.symptom_questions) {
+                await fb_send_message(user_id, { "text": "No need to reset my session." });
+                await fb_send_message(user_id, { "text": "Just tell me about your condition." });
+                return;
+            }
+
+            await fb_send_message(user_id, {"text": "Ok. Five me a sec to reset the conversation"});
             const save_status = await save_data(user_id, '{}');
+            await fb_send_message(user_id, { "text": "Done! Let's start over." });
+            return;
+        }
+
+        // ignore emoji messages
+        if (
+            is_emoji(text) ||
+            (input.sticker_id && input.sticker_id === config.FB_LIKE_BUTTON_ID)
+            ) {
             return fb_send_message(user_id, {
-                "text": "Reseting question cache..."
+                "text": _.sample(responses.emojis)
             });
         }
+
+        await fb_send_message(user_id, {
+            "text": `I'm going to ask you a few questions`
+        });
+
+        await fb_send_message(user_id, {
+            "text": `to try and diagnose your problem`
+        });
+
 
         // respond to other things
         if (
@@ -298,4 +335,13 @@ const save_data = (user_id, data = '') => {
             good(reply);
         });
     });
+}
+
+/**
+ * Utility function to find specific facebook entities
+ * @param {Object} nlp - fb nlp object
+ * @param {string} name - entity name
+ */
+const first_entity = (nlp, name) => {
+    return nlp && nlp.entities && nlp.entities[name] && nlp.entities[name][0];
 }

@@ -23,8 +23,9 @@ class Wikipedia {
                     parse_data: [],
                     images: []
                 };
+                
                 const { infoboxes, sections, images} = data;
-                good(data);
+
                 if (images) {
                     parsed_response.images = images;
                 }
@@ -35,6 +36,7 @@ class Wikipedia {
                         // wikipedia throws a lot of unexpected object keys
                         parsed_response.name = data['Name'] ? data['Name'].text : data.name.text || "";
                         parsed_response.caption = data['Caption'] ? data['Caption'].text : data.caption ? data.caption.text : "";
+                        
                         parsed_response.type = data.field ? data.field.text : "";
                         parsed_response.symptoms = data.symptoms ? data.symptoms.text.split(',').map(s => s.trim()) : null;
 

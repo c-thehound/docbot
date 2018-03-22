@@ -16,7 +16,17 @@ async function classify_text (text) {
     return nlp.classify(text);
 }
 
+/**
+ * Check if two strings are closely matched to each other
+ * @param {string} a first string
+ * @param {string} b last string
+ */
+function close_enough (a, b) {
+    return natural.JaroWinklerDistance(a, b) > 0.8;
+}
+
 module.exports = {
     classify_text,
-    get_classifications
+    get_classifications,
+    close_enough
 }

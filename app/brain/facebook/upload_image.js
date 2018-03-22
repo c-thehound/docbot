@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('../../config');
+const config = require('../../../config');
 /**
  * Uploads an image to a facebook user
  * @param {String} sender_psid unique converstion id of user
@@ -8,6 +8,7 @@ const config = require('../../config');
 module.exports = async (sender_psid, url_path) => {
     // Construct the message body
     let request_body = {
+        "messaging_type": "RESPONSE",
         "recipient": {
             "id": sender_psid
         },

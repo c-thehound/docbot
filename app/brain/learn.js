@@ -1,6 +1,8 @@
 const crawl = require('./crawl');
 const greetings = require('../intents/greetings');
 const natural = require('natural');
+const classifier_model = require('../models/classifier');
+const commands = require('../entities/commands');
 const classifier = new natural.BayesClassifier();
 /**
  * Build the neural net
@@ -35,18 +37,27 @@ async function learn () {
             if (complications.list) complications.list.map(comp => classifier.addDocument(comp, entity));
         }
 
-        parse_data.map(datum => {
-            const { text, list } = datum;
-            classifier.addDocument(text, entity);
-            if (list) {
-                list.map(el => classifier.addDocument(el, entity));
-            }
-        });
+        if (parse_data) {
+            parse_data.map(datum => {
+                const { text, list } = datum;
+                classifier.addDocument(text, entity);
+                if (list) {
+                    list.map(el => classifier.addDocument(el, entity));
+                }
+            });
+        }
     });
     // lets not forget to train the classifier to recognise greetings too
     greetings.expressions.map(expression => {
         classifier.addDocument(expression, greetings.intent);
     });
+    // train commands
+    commands.map(command => {
+        const { name, messages } = command;
+        messages.map(message => {
+            classifier.addDocument(message, name);
+        });
+    })
 }
 
 async function learn_and_train () {

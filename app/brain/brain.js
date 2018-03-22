@@ -4,7 +4,6 @@
  * @author Pozy <masikapolycarp@gmail.com>
 */
 const natural = require('natural');
-const classifier_model = require('../models/classifier');
 const generate_questions = require('./question_generator');
 const process_input = require('./process_input');
 const classify_text = require('./classify_text');

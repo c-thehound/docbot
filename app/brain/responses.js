@@ -5,6 +5,20 @@ const greetings = [
     ':) hi'
 ];
 
+const thanks = [
+    `you're welcome`,
+    `glad i could help`,
+    'cheers'
+];
+
+const emojis = [
+    'cheers!',
+    'awesome',
+    'wuhoooo'
+]
+
 module.exports = {
-    greetings
+    greetings,
+    thanks,
+    emojis
 }
