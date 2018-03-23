@@ -140,21 +140,30 @@ async function analyze_input (user_id, user_obj, input) {
 
             _.forEach(symptom_questions, (entity_object) => {
                 const { entity, questions } = entity_object;
+                // don't repeat the same questions
+                const unasked = _.filter(questions, q => !q.asked);
 
-                if (questions.length > 0) {
-                    // don't repeat the same questions
-                    const unasked = _.filter(questions, q => !q.asked);
-                    if (unasked.length > 0) {
-                        // take 2 questions
-                        // TODO: Is this enough
-                        const samples = _.sampleSize(unasked, 2);
-                        samples.map(q => ui_questions.push(q));
-                    }
+                if (unasked.length > 0) {
+                    // take 2 questions
+                    // TODO: Is this enough
+                    const samples = _.sampleSize(unasked, 2);
+                    samples.map(q => {
+                        // sometimes the system may throw up similar questions,
+                        // try and delete similary sounding questions
+                        if (ui_questions.length > 0) {
+                            ui_questions.map(picked_q => {
+                                if (!text_classifier.close_enough(picked_q, q)) {
+                                    ui_questions.push(q);
+                                }
+                            });
+                        }
+
+                    })
                 }
 
             });
+            
             // save this to cache
-
             let data = _.assign({}, user_data, {
                 symptom_questions,
                 classifications: top_intents,
