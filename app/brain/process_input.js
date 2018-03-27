@@ -1,7 +1,7 @@
 const redis = require('redis');
 const config = require('../../config');
 const redis_client = redis.createClient(config.REDIS_PORT);
-const text_classifier = require('./classify_text');
+const { classify_text, get_classifications, close_enough } = require('./classify_text');
 const greetings = require('../intents/greetings');
 const responses = require('./responses');
 const generate_question = require('./question_generator');
@@ -77,7 +77,7 @@ async function analyze_input (user_id, user_obj, input) {
         const { text, nlp } = input;
         const start_command = _.find(commands, c => c.name === 'restart');
         // recognise basic text meanings such as thank you messages
-        const greetings = await text_classifier.classify_text(text) === 'greetings';
+        const greetings = await classify_text(text) === 'greetings';
         if (greetings) {
             // greet the user back
             // greet user here
@@ -88,7 +88,7 @@ async function analyze_input (user_id, user_obj, input) {
 
         // reset cache command
         const matches_command = _.filter(start_command.messages, message => {
-            return text && text_classifier.close_enough(message, text);
+            return text && close_enough(message, text);
         });
 
         if (matches_command.length > 0) {
@@ -129,7 +129,7 @@ async function analyze_input (user_id, user_obj, input) {
             !user_data ||
             !user_data.symptom_questions
         ) {
-            const classifications = await text_classifier.get_classifications(text);
+            const classifications = await get_classifications(text);
             // choose top 5 entitites from response
             // _.sortyBy returns an ascending array
             const top_intents = _.sortBy(classifications, ['value']).reverse().slice(0, 5);
