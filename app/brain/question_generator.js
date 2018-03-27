@@ -4,7 +4,7 @@
  * @param {Array} symptoms - an array of 'confused' symptoms - this is just
  * made up of text like 'pain in the belly'
  * @returns {Array[string]} this should return a list of valid questions like ['do you have pain in the belly?']
- * @author pozy<masikapolycarp@gmail.com>
+ * @author pozy <masikapolycarp@gmail.com>
  */
 const pos = require('pos');
 const _ = require('lodash');
@@ -115,7 +115,7 @@ module.exports = (symptoms = []) => {
                     break;
             };
             // the full question in all its glory
-            const question = _.upperFirst(`${sample_q} ${word.toLocaleLowerCase()}${rest_words ? ' ' + rest_words : ''}?`);
+            const question = _.upperFirst(`${sample_q} ${word.toLocaleLowerCase()} ${rest_words || ''}?`);
             questions.push(question);
         }
     }
