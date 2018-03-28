@@ -97,6 +97,8 @@ async function analyze_input (user_id, user_obj, input) {
             return text && close_enough(message, text);
         });
 
+        console.log('are we here?');
+
         if (greetings) {
             // greet the user back
             // greet user here
