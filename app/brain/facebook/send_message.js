@@ -6,6 +6,7 @@ const config = require('../../../config');
  * @param {Object} response_message message to send to user
  */
 module.exports = async (sender_psid, response_message) => {
+    console.log('is thissssssssssssss being calllled');
     // Construct the message body
     let request_body = {
         "messaging_type": "RESPONSE",
