@@ -17,7 +17,6 @@ if (process.env.NODE_ENV === 'production') {
             database: config.pathname.slice(1)
         }
     };
-    console.log(db_settings);
     module.exports = require('knex')(db_settings);
 } else {
     module.exports = require('knex')({

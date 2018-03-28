@@ -20,7 +20,7 @@ if (config.AUTH) {
     redis_client = redis.createClient(config.REDIS_PORT, config.REDIS_HOST_NAME);
     redis_client.auth(config.AUTH.split(":")[1]);
 } else {
-    const redis_client = redis.createClient(config.REDIS_PORT);
+    redis_client = redis.createClient(config.REDIS_PORT);
 }
 
 /**
@@ -30,6 +30,7 @@ if (config.AUTH) {
 module.exports = async function (webhook_event) {
     const { sender: { id }, message, postback } = webhook_event;
     let user_data = await get_data(id);
+    console.log('[user data]',user_data);
     if (user_data === null) {
         const save_status = await save_data(id, '{}');
     }
