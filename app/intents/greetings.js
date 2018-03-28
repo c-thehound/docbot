@@ -50,7 +50,8 @@ const expressions = [
     'Hello, good afternoon !',
     'good afternoon',
     'Good morning',
-    'how are you today?'
+    'how are you today?',
+    'how are you'
 ];
 
 module.exports = {

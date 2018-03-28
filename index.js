@@ -4,7 +4,7 @@
  * @author pozy<masikapolycarp@gmail.com>
  */
 const express = require('express');
-const config = require('./config');
+const config = require('./config')();
 const tokens = require('./app/tokens');
 const source_model = require('./app/models/sources')
 const api_medic_model = require('./app/models/apimedic');

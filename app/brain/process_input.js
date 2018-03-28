@@ -1,6 +1,5 @@
 const redis = require('redis');
-const config = require('../../config');
-const redis_client = redis.createClient(config.REDIS_PORT);
+const config = require('../../config')();
 const { classify_text, get_classifications, close_enough } = require('./classify_text');
 const greetings = require('../intents/greetings');
 const responses = require('./responses');
@@ -13,6 +12,17 @@ const fb_upload_image = require('./facebook/upload_image');
 const fb_update_home_screen = require('./facebook/profile');
 const is_emoji = require('./facebook/detect_emoji');
 const commands = require('../entities/commands');
+const makes_sense = require('./makes_sense');
+
+let redis_client = null;
+if (config.AUTH) {
+    // means this is a production server
+    redis_client = redis.createClient(config.PORT, config.REDIS_HOST_NAME);
+    redis_client.auth(config.AUTH.split(":")[1]);
+} else {
+    const redis_client = redis.createClient(config.REDIS_PORT);
+}
+
 /**
  * Process user input
  * @param {Object} webhook_event - Facebook messenger webhook event
@@ -46,6 +56,7 @@ async function analyze_input (user_id, user_obj, input) {
         const payload = JSON.parse(input.payload);
         // this will be cached for later analysis
         let current_question = {};
+
         const updated_questions = _.map(user_data.symptom_questions, (entity_object) => {
             let { entity, questions } = entity_object;
 
@@ -78,6 +89,13 @@ async function analyze_input (user_id, user_obj, input) {
         const start_command = _.find(commands, c => c.name === 'restart');
         // recognise basic text meanings such as thank you messages
         const greetings = await classify_text(text) === 'greetings';
+        // don't continue if the user sent useless text
+        const good_sentense = await makes_sense(text);
+        // reset cache command
+        const matches_command = _.filter(start_command.messages, message => {
+            return text && close_enough(message, text);
+        });
+
         if (greetings) {
             // greet the user back
             // greet user here
@@ -85,11 +103,6 @@ async function analyze_input (user_id, user_obj, input) {
                 "text": _.sample(responses.greetings)
             });
         }
-
-        // reset cache command
-        const matches_command = _.filter(start_command.messages, message => {
-            return text && close_enough(message, text);
-        });
 
         if (matches_command.length > 0) {
             // if i don't have any data on user, ignore the reset command
@@ -115,14 +128,31 @@ async function analyze_input (user_id, user_obj, input) {
             });
         }
 
-        await fb_send_message(user_id, {
-            "text": `I'm going to ask you a few questions`
-        });
+        // last chance if we can't understand
+        if (!good_sentense) {
+            await fb_send_message(
+                user_id,
+                {
+                    text: _.capitalize(_.sample(responses.cant_understand))
+                }
+            );
 
-        await fb_send_message(user_id, {
-            "text": `to try and diagnose your problem`
-        });
+            await fb_send_message(
+                user_id,
+                {
+                    text: 'Type in symptom related stuff'
+                }
+            );
 
+            await fb_send_message(
+                user_id,
+                {
+                    text: 'Something like "I have a headache" or "i have a fever"'
+                }
+            );
+
+            return;
+        }
 
         // respond to other things
         if (
@@ -133,6 +163,7 @@ async function analyze_input (user_id, user_obj, input) {
             // choose top 5 entitites from response
             // _.sortyBy returns an ascending array
             const top_intents = _.sortBy(classifications, ['value']).reverse().slice(0, 5);
+           
             const labels = _.map(top_intents, i => i.label);
             const symptom_questions = await get_entity_questions(labels);
             // a group of questions to ask user
@@ -147,18 +178,7 @@ async function analyze_input (user_id, user_obj, input) {
                     // take 2 questions
                     // TODO: Is this enough
                     const samples = _.sampleSize(unasked, 2);
-                    samples.map(q => {
-                        // sometimes the system may throw up similar questions,
-                        // try and delete similary sounding questions
-                        if (ui_questions.length > 0) {
-                            ui_questions.map(picked_q => {
-                                if (!text_classifier.close_enough(picked_q, q)) {
-                                    ui_questions.push(q);
-                                }
-                            });
-                        }
-
-                    })
+                    samples.map(q => ui_questions.push(q));
                 }
 
             });
@@ -181,7 +201,6 @@ async function analyze_input (user_id, user_obj, input) {
 
     const { symptom_questions, classifications, cached_questions } = user_data;
     // select the top most question and ask user
-    // console.log(cached_questions);
     const question = cached_questions.shift();
     let response = null;
 
@@ -219,29 +238,39 @@ async function analyze_input (user_id, user_obj, input) {
 
     } else {
         // if here it means we are done with acquiring information and shoud now process requests
-        const promises = [
-            fb_send_message(user_id, {
-                "text": "That is enough for now"
-            }),
-            fb_send_message(user_id, {
-                "text": "Let me try and see if i can identify the problem"
-            }),
-        ];
-        await Promise.all(promises);
         // time to score the responses
         const { answers } = user_data;
         const scores = {};
+        // just a key value store of entity and score
+        // eg { malaria: 6}
         answers.map(answer => {
             scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
         });
-        
-        let sorted_scores =_.chain(scores)
+
+        let sorted_scores = _.chain(scores)
             .map((val, key) => {
                 return { entity: key, score: val }
             })
             .sortBy(['score'])
             .reverse()
             .value();
+        
+        if (sorted_scores.length === 0) {
+            // another instance of understood text that sneeked thorugh oour filters
+            await fb_send_message(user_id, {
+                'text': 'It looks like i could not understand your message'
+            });
+
+            await fb_send_message(user_id, {
+                'text': 'Sorry but you have to type something else'
+            });
+
+            await fb_send_message(user_id, {
+                'text': 'If this persists, restart me by texting reboot or /start'
+            });
+
+            return;
+        }
 
         const first = sorted_scores[0];
         const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data']);
@@ -252,6 +281,15 @@ async function analyze_input (user_id, user_obj, input) {
         const info = extra[0].text;
         const chunked_messages = info.split('.');
         const chunked_promises = [];
+        const feedback = [
+            fb_send_message(user_id, {
+                "text": "That is enough for now"
+            }),
+            fb_send_message(user_id, {
+                "text": "Let me try and see if i can identify the problem"
+            }),
+        ];
+        await Promise.all(feedback);
         // tell diagnosis
         await fb_send_message(user_id, {
             "text": `From my calculations, it is highly possible that you have ${ name }.`
