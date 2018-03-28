@@ -3,14 +3,28 @@
  * I use knex for its awesome querybuilder
  * @author pozy<masikapolycarp@gmail.com>
  */
-const knex = require('knex')({
-    client: 'mysql',
-    connection: {
-        host: '127.0.0.1',
-        user: 'root',
-        password: '',
-        database: 'docbot'
-    }
-});
+const url = require('url');
 
-module.exports = knex;
+if (process.env.NODE_ENV === 'production') {
+    const config = url.parse(process.env.CLEAR_DB_DATABASE_URL);
+    const [ user, password ] = config.path.split(':');
+    module.exports = require('knex')({
+        client: 'mysql',
+        connection: {
+            host: config.host,
+            user: user,
+            password: password,
+            database: config.pathname.slice(1)
+        }
+    });
+} else {
+    module.exports = require('knex')({
+        client: 'mysql',
+        connection: {
+            host: '127.0.0.1',
+            user: 'root',
+            password: '',
+            database: 'docbot'
+        }
+    });
+}
