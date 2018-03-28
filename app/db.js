@@ -6,7 +6,7 @@
 const url = require('url');
 
 if (process.env.NODE_ENV === 'production') {
-    const config = url.parse(process.env.CLEAR_DB_DATABASE_URL);
+    const config = url.parse(process.env.CLEARDB_DATABASE_URL);
     const [ user, password ] = config.path.split(':');
     module.exports = require('knex')({
         client: 'mysql',
