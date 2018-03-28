@@ -30,7 +30,6 @@ if (config.AUTH) {
 module.exports = async function (webhook_event) {
     const { sender: { id }, message, postback } = webhook_event;
     let user_data = await get_data(id);
-    console.log('[user data]',user_data);
     if (user_data === null) {
         const save_status = await save_data(id, '{}');
     }
@@ -100,12 +99,6 @@ async function analyze_input (user_id, user_obj, input) {
         if (greetings) {
             // greet the user back
             // greet user here
-            let f = await fb_send_message(user_id, {
-                "text": _.sample(responses.greetings)
-            });
-
-            console.log('f', f);
-
             return fb_send_message(user_id, {
                 "text": _.sample(responses.greetings)
             });

@@ -143,5 +143,6 @@ app.get('/apimedic/issues', (req, res) => {
     });
 });
 
-
+// production server is - https://still-depths-76007.herokuapp.com/webhook
+// local server is -  http://localhost:3124/webhook
 app.listen(port, () => console.log(`App started on port ${port}`));
