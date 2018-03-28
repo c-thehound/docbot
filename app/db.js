@@ -1,5 +1,3 @@
-import { settings } from 'cluster';
-
 /**
  * Database configurations
  * I use knex for its awesome querybuilder
