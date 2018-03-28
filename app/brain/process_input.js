@@ -17,7 +17,7 @@ const makes_sense = require('./makes_sense');
 let redis_client = null;
 if (config.AUTH) {
     // means this is a production server
-    redis_client = redis.createClient(config.PORT, config.REDIS_HOST_NAME);
+    redis_client = redis.createClient(config.REDIS_PORT, config.REDIS_HOST_NAME);
     redis_client.auth(config.AUTH.split(":")[1]);
 } else {
     const redis_client = redis.createClient(config.REDIS_PORT);
