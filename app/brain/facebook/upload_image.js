@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('../../../config');
+const config = require('../../../config')();
 /**
  * Uploads an image to a facebook user
  * @param {String} sender_psid unique converstion id of user

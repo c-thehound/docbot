@@ -1,12 +1,11 @@
 const axios = require('axios');
-const config = require('../../../config');
+const config = require('../../../config')();
 /**
  * utitlity function that sends a facebook message
  * @param {String} sender_psid  unique comversation id of the user
  * @param {Object} response_message message to send to user
  */
 module.exports = async (sender_psid, response_message) => {
-    console.log('is thissssssssssssss being calllled');
     // Construct the message body
     let request_body = {
         "messaging_type": "RESPONSE",

@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('../../../config');
+const config = require('../../../config')();
 /**
  * utitlity function that updates the bots home screen page on messenger
  */
