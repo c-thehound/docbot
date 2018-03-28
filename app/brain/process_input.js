@@ -97,11 +97,15 @@ async function analyze_input (user_id, user_obj, input) {
             return text && close_enough(message, text);
         });
 
-        console.log('are we here?', greetings);
-
         if (greetings) {
             // greet the user back
             // greet user here
+            let f = await fb_send_message(user_id, {
+                "text": _.sample(responses.greetings)
+            });
+
+            console.log('f', f);
+
             return fb_send_message(user_id, {
                 "text": _.sample(responses.greetings)
             });
