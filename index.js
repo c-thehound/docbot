@@ -11,6 +11,7 @@ const api_medic_model = require('./app/models/apimedic');
 const wikipedia_model = require('./app/models/wikipedia');
 const brain = require('./app/brain/brain');
 const wiki = new wikipedia_model();
+const port = process.env.PORT || config.PORT;
 
 const app = express();
 app.use(express.json());
@@ -143,4 +144,4 @@ app.get('/apimedic/issues', (req, res) => {
 });
 
 
-app.listen(config.PORT, () => console.log(`App started on port ${config.PORT}`));
+app.listen(port, () => console.log(`App started on port ${port}`));
