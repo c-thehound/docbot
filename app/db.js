@@ -1,3 +1,5 @@
+import { settings } from 'cluster';
+
 /**
  * Database configurations
  * I use knex for its awesome querybuilder
@@ -8,7 +10,7 @@ const url = require('url');
 if (process.env.NODE_ENV === 'production') {
     const config = url.parse(process.env.CLEARDB_DATABASE_URL);
     const [ user, password ] = config.path.split(':');
-    module.exports = require('knex')({
+    const db_settings = {
         client: 'mysql',
         connection: {
             host: config.host,
@@ -16,7 +18,9 @@ if (process.env.NODE_ENV === 'production') {
             password: password,
             database: config.pathname.slice(1)
         }
-    });
+    };
+    console.log(settings);
+    module.exports = require('knex')(db_settings);
 } else {
     module.exports = require('knex')({
         client: 'mysql',
