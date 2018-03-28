@@ -7,7 +7,7 @@ const url = require('url');
 
 if (process.env.NODE_ENV === 'production') {
     const config = url.parse(process.env.CLEARDB_DATABASE_URL);
-    const [ user, password ] = config.path.split(':');
+    const [ user, password ] = config.auth.split(':');
     const db_settings = {
         client: 'mysql',
         connection: {
