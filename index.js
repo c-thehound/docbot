@@ -16,6 +16,7 @@ const port = process.env.PORT || config.PORT;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/pdf', express.static(__dirname + '/tmp'));
 
 app.post('/webhook', (req, res) => {
 

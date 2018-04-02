@@ -13,5 +13,18 @@ module.exports = [
             "reboot",
             "boot"
         ]
+    },
+    {
+        name: "download_report",
+        messages: [
+            "download report",
+            "pdf",
+            "report save",
+            "i want a report",
+            "show me diagnosis history",
+            "disease history",
+            "upload file",
+            "save my report"
+        ]
     }
 ]

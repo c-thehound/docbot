@@ -1,5 +1,7 @@
 const for_all = {
     PORT: 3128,
+    // this changes very often
+    BASE_URL: 'https://69d743f5.ngrok.io',
     FB_HOME_SCREEN_SET: false,
     FB_VERIFY_TOKEN: '125c6da3-cd64-4c71-a242-c8f9bf8ee8cd',
     FB_LIKE_BUTTON_ID: 369239263222822,
@@ -13,6 +15,7 @@ module.exports = () => {
             const rtg = require("url").parse(process.env.REDIS_URL);
             return Object.assign({}, for_all, {
                 REDIS_PORT: rtg.port,
+                BASE_URL: 'https://still-depths-76007.herokuapp.com',
                 REDIS_HOST_NAME: rtg.hostname,
                 AUTH: rtg.auth
             });
@@ -22,7 +25,7 @@ module.exports = () => {
         default:
             console.log('running in developmen mode');
             return Object.assign({}, for_all, {
-                REDIS_PORT: 6379
+                REDIS_PORT: 6379,
             });
             break;
             break;

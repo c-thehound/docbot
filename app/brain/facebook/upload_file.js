@@ -1,11 +1,11 @@
 const axios = require('axios');
 const config = require('../../../config')();
 /**
- * Uploads an image to a facebook user
+ * Uploads a file to a facebook user
  * @param {String} sender_psid unique converstion id of user
  * @param {String} url_path the url path for the uploaded image
  */
-module.exports = async (sender_psid, url_path) => {
+module.exports = async (sender_psid, url_path, type = 'image') => {
     // Construct the message body
     let request_body = {
         "messaging_type": "RESPONSE",
@@ -14,7 +14,7 @@ module.exports = async (sender_psid, url_path) => {
         },
         "message": {
             "attachment": {
-                "type": "image",
+                "type": type,
                 "payload": {
                     "is_reusable": true,
                     "url": url_path

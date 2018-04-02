@@ -1,4 +1,3 @@
-const redis = require('redis');
 const config = require('../../config')();
 const { classify_text, get_classifications, close_enough } = require('./classify_text');
 const greetings = require('../intents/greetings');
@@ -8,21 +7,14 @@ const entity_model = require('../models/entity');
 const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const fb_send_message = require('./facebook/send_message');
-const fb_upload_image = require('./facebook/upload_image');
+const fb_upload_file = require('./facebook/upload_file');
 const fb_update_home_screen = require('./facebook/profile');
 const is_emoji = require('./facebook/detect_emoji');
 const commands = require('../entities/commands');
 const makes_sense = require('./makes_sense');
-
-let redis_client = null;
-if (config.AUTH) {
-    // means this is a production server
-    redis_client = redis.createClient(config.REDIS_PORT, config.REDIS_HOST_NAME);
-    redis_client.auth(config.AUTH.split(":")[1]);
-} else {
-    redis_client = redis.createClient(config.REDIS_PORT);
-}
-
+const { get_data, save_data } = require('./cache');
+const diagnosis_model = require('../models/diagnosis');
+const generate_report = require('../utils/generate_report');
 /**
  * Process user input
  * @param {Object} webhook_event - Facebook messenger webhook event
@@ -52,41 +44,66 @@ async function analyze_input (user_id, user_obj, input) {
     }
 
     // payload is usually the user's response when asked a question
-    if (input.payload) {
-        const payload = JSON.parse(input.payload);
-        // this will be cached for later analysis
-        let current_question = {};
+    if (input.quick_reply) {
+        // we'll depend on json.parse breaking to filter out non json content
+        try {
+            const payload = JSON.parse(input.quick_reply.payload);
+            // this will be cached for later analysis
+            let current_question = {};
+            const updated_questions = _.map(user_data.symptom_questions, (entity_object) => {
+                let { entity, questions } = entity_object;
 
-        const updated_questions = _.map(user_data.symptom_questions, (entity_object) => {
-            let { entity, questions } = entity_object;
+                if (entity = payload.entity) {
+                    questions = questions.map(question => {
+                        if (question.id === payload.question_id) {
+                            let score = 0;
 
-            if (entity = payload.entity) {
-                questions = questions.map(question => {
-                    if (question.id === payload.question_id) {
-                        const q = _.assign({}, question, { asked: true, score: payload.succeeded ? 1 : 0 });
-                        current_question = q;
-                        return q;
-                    }
+                            if (payload.succeeded === responses.responses_types.YES) {
+                                score = 1;
+                            } else if (payload.succeeded === responses.responses_types.NOT_SURE) {
+                                score = .5;
+                            }
 
-                    return question;
+                            const q = _.assign({}, question, { asked: true, score });
+                            current_question = q;
+                            return q;
+                        }
+
+                        return question;
+                    });
+                }
+                // this is just the modified entity_object
+                return {
+                    entity,
+                    questions
+                };
+            });
+
+            user_data = _.assign({}, user_data, {
+                symptom_questions: updated_questions,
+                answers: user_data.answers.concat(current_question)
+            });
+        } catch (e) {
+            // this is not json so parse as normal strings
+            const { payload} = input.quick_reply;
+            if (payload === responses.useful_types.USEFUL) {
+                // great! we can save diagnosis and refresh cache
+                await fb_send_message(user_id, {
+                    text: 'Awesome! Glad i helped.'
                 });
-            }
-            // this is just the modified entity_object
-            return {
-                entity,
-                questions
-            };
-        });
 
-        user_data = _.assign({}, user_data, {
-            symptom_questions: updated_questions,
-            answers: user_data.answers.concat(current_question)
-        });
+                await diagnosis_model.save_diagnosis(user_id, JSON.stringify(user_data.diagnosis));
+                await save_data(user_id, '{}');
+            }
+
+            return;
+        }
 
     } else {
         // respond to user answers
         const { text, nlp } = input;
         const start_command = _.find(commands, c => c.name === 'restart');
+        const download_command  =_.find(commands, c => c.name === 'download_report');
         // recognise basic text meanings such as thank you messages
         const greetings = await classify_text(text) === 'greetings';
         // don't continue if the user sent useless text
@@ -94,6 +111,10 @@ async function analyze_input (user_id, user_obj, input) {
         // reset cache command
         const matches_command = _.filter(start_command.messages, message => {
             return text && close_enough(message, text);
+        });
+        // download report command
+        const matches_download = _.filter(download_command.messages, m => {
+            return text && close_enough(m, text);
         });
 
         if (greetings) {
@@ -115,6 +136,19 @@ async function analyze_input (user_id, user_obj, input) {
             await fb_send_message(user_id, {"text": "Ok. Five me a sec to reset the conversation"});
             const save_status = await save_data(user_id, '{}');
             await fb_send_message(user_id, { "text": "Done! Let's start over." });
+            return;
+        }
+
+        if (matches_download.length > 0) {
+            generate_report(user_id).then(async (filename) => {
+                await fb_send_message(user_id, { "text": "Please wait while i generate a report" });
+                await fb_upload_file(user_id, `${config.BASE_URL}/pdf/${file_name}`, 'file');
+                await fb_send_message(user_id, { "text": "I've just sent the file. Download to view" });
+            }).catch(error => {
+                if (error === 'no_data') {
+                    fb_send_message(user_id, { text: "No medical history found. "});
+                }
+            })
             return;
         }
 
@@ -154,7 +188,7 @@ async function analyze_input (user_id, user_obj, input) {
             return;
         }
 
-        // respond to other things
+        // generate questions from user text
         if (
             !user_data ||
             !user_data.symptom_questions
@@ -206,40 +240,46 @@ async function analyze_input (user_id, user_obj, input) {
 
     if (question) {
         response = {
-            "attachment": {
-                "type": "template",
-                "payload": {
-                    "template_type": "button",
-                    "text": question.question,
-                    "buttons": [
-                        {
-                            "type": "postback",
-                            "title": "Yes",
-                            // this payload is important to track subsequent requests
-                            "payload": JSON.stringify({
-                                "question_id": question.id,
-                                "succeeded": true,
-                                "entity": question.entity
-                            })
-                        },
-                        {
-                            "type": "postback",
-                            "title": "No",
-                            "payload": JSON.stringify({
-                                "question_id": question.id,
-                                "succeeded": false,
-                                "entity": question.entity
-                            })
-                        }
-                    ]
+            text: question.question,
+            quick_replies: [
+                {
+                    "content_type": "text",
+                    "title": "Yes",
+                    // this payload is important to track subsequent requests
+                    "payload": JSON.stringify({
+                        "question_id": question.id,
+                        "succeeded": responses.responses_types.YES,
+                        "entity": question.entity
+                    })
+                },
+                {
+                    "content_type": "text",
+                    "title": "No",
+                    "payload": JSON.stringify({
+                        "question_id": question.id,
+                        "succeeded": responses.responses_types.NO,
+                        "entity": question.entity
+                    })
+                },
+                {
+                    "content_type": "text",
+                    "title": "I'm not sure",
+                    "payload": JSON.stringify({
+                        "question_id": question.id,
+                        "succeeded": responses.responses_types.NOT_SURE,
+                        "entity": question.entity
+                    })
                 }
-            }
-        };
-
+            ]
+        }
+  
     } else {
         // if here it means we are done with acquiring information and shoud now process requests
         // time to score the responses
         const { answers } = user_data;
+        let diagnosis = {
+            answers
+        };
         const scores = {};
         // just a key value store of entity and score
         // eg { malaria: 6}
@@ -289,6 +329,10 @@ async function analyze_input (user_id, user_obj, input) {
                 "text": "Let me try and see if i can identify the problem"
             }),
         ];
+
+        diagnosis.illness = name;
+        diagnosis.info = info
+
         await Promise.all(feedback);
         // tell diagnosis
         await fb_send_message(user_id, {
@@ -299,7 +343,7 @@ async function analyze_input (user_id, user_obj, input) {
             await fb_send_message(user_id, {
                 "text": `Here's what ${name} looks like`
             });
-            await fb_upload_image(user_id, images[0].url);
+            await fb_upload_file(user_id, images[0].url);
         }
         // just in case the description is long chunk it into sentences
         chunked_messages.map(message => {
@@ -311,8 +355,31 @@ async function analyze_input (user_id, user_obj, input) {
                 )
             }
         });
-
         await Promise.all(chunked_promises);
+
+        // try and see if what i asked is useful at all to the user
+        await fb_send_message(user_id, {
+            text: _.sample(responses.useful),
+            quick_replies: [
+                {
+                    "content_type": "text",
+                    "title": "Yes, you helped",
+                    "payload": responses.useful_types.USEFUL
+                },
+                {
+                    "content_type": "text",
+                    "title": "No",
+                    "payload": responses.useful_types.USEFUL
+                },
+                {
+                    "content_type": "text",
+                    "title": "i'm not sure",
+                    "payload": responses.useful_types.USEFUL
+                },
+            ]
+        });
+
+        user_data = _.assign(user_data, { diagnosis });
     };
 
     // persist our state
@@ -353,35 +420,6 @@ async function get_entity_questions (entities = []) {
     }
 
     return questions;
-}
-
-/**
- * Get saved details from redis cache
- * @param {*} user_id unique user identifier
- */
-const get_data = (user_id) => {
-    console.info('[redis] get data');
-    return new Promise ((good, bad) => {
-        redis_client.get(user_id, (err, reply) => {
-            if (err) bad(err);
-            good(reply);
-        })
-    });
-}
-
-/**
- * Save user data to reds cache
- * @param {string} user_id unique user identifier
- * @param {JSON} data json encode string to be saved (JSON.stringify(data))
- */
-const save_data = (user_id, data = '') => {
-    return new Promise ((good, bad) => {
-        console.info('[redis] save data');
-        redis_client.set(user_id, data, (err, reply) => {
-            if (err) bad(err);
-            good(reply);
-        });
-    });
 }
 
 /**
