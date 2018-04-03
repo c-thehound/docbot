@@ -28,8 +28,22 @@ const save_data = (user_id, data = '') => {
     });
 }
 
+/**
+ * Reset the cache for this user
+ * @param {string} user_id unique user identifier
+ */
+const reset_data = (user_id) => {
+    return new Promise((good, bad) => {
+        console.info('[redis] clear data');
+        redis_client.set(user_id, '{}', (err, reply) => {
+            if (err) bad(err);
+            good(reply);
+        })
+    });
+}
 
 module.exports = {
     save_data,
-    get_data
+    get_data,
+    reset_data
 };

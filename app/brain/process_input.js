@@ -8,13 +8,16 @@ const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const fb_send_message = require('./facebook/send_message');
 const fb_upload_file = require('./facebook/upload_file');
-const fb_update_home_screen = require('./facebook/profile');
+const fb_update_home_screen = require('./facebook/homepage');
+const fb_profile = require('./facebook/profile');
 const is_emoji = require('./facebook/detect_emoji');
 const commands = require('../entities/commands');
 const makes_sense = require('./makes_sense');
-const { get_data, save_data } = require('./cache');
+const { get_data, save_data, reset_data } = require('./cache');
 const diagnosis_model = require('../models/diagnosis');
 const generate_report = require('../utils/generate_report');
+const constants = require('../../constants');
+
 /**
  * Process user input
  * @param {Object} webhook_event - Facebook messenger webhook event
@@ -23,7 +26,7 @@ module.exports = async function (webhook_event) {
     const { sender: { id }, message, postback } = webhook_event;
     let user_data = await get_data(id);
     if (user_data === null) {
-        const save_status = await save_data(id, '{}');
+        const save_status = await reset_data(id);
     }
 
     let analysis = await analyze_input(id, user_data, message || postback);
@@ -41,6 +44,23 @@ async function analyze_input (user_id, user_obj, input) {
 
     if (config.FB_HOME_SCREEN_SET) {
         await fb_update_home_screen();
+    }
+    // the first time a user opens a conversation this is sent
+    if (input.payload && input.payload === constants.FIRST_TIME_USER) {
+        const profile = await fb_profile(user_id);
+        const welcome = `Hello ${profile ? profile.first_name : ' there '}! I'm DocBot, your new health assistant.`;
+        await send_message(user_id, welcome);
+        await fb_send_message(user_id, {
+            text: 'Are you ready to take charge of your health?',
+            quick_replies: [
+                {
+                    "content_type": "text",
+                    "title": "Let's go!",
+                    "payload": constants.GET_STARTED
+                }
+            ]
+        });
+        return;
     }
 
     // payload is usually the user's response when asked a question
@@ -85,7 +105,8 @@ async function analyze_input (user_id, user_obj, input) {
             });
         } catch (e) {
             // this is not json so parse as normal strings
-            const { payload} = input.quick_reply;
+            const { payload } = input.quick_reply;
+            console.log(payload);
             if (payload === responses.useful_types.USEFUL) {
                 // great! we can save diagnosis and refresh cache
                 await fb_send_message(user_id, {
@@ -93,10 +114,16 @@ async function analyze_input (user_id, user_obj, input) {
                 });
 
                 await diagnosis_model.save_diagnosis(user_id, JSON.stringify(user_data.diagnosis));
-                await save_data(user_id, '{}');
+                await reset_data(user_id);
+                return;
+            }
+            // after user presses let's go!
+            if (payload === constants.GET_STARTED) {
+                await send_message(user_id, 'Tell me about your symptoms');
+                await send_message(user_id, 'For example "my stomach hurts" or "i feel cold"');
+                return;
             }
 
-            return;
         }
 
     } else {
@@ -134,7 +161,7 @@ async function analyze_input (user_id, user_obj, input) {
             }
 
             await fb_send_message(user_id, {"text": "Ok. Five me a sec to reset the conversation"});
-            const save_status = await save_data(user_id, '{}');
+            const save_status = await reset_data(user_id);
             await fb_send_message(user_id, { "text": "Done! Let's start over." });
             return;
         }
@@ -369,12 +396,12 @@ async function analyze_input (user_id, user_obj, input) {
                 {
                     "content_type": "text",
                     "title": "No",
-                    "payload": responses.useful_types.USEFUL
+                    "payload": responses.useful_types.NOT_USEFUL
                 },
                 {
                     "content_type": "text",
                     "title": "i'm not sure",
-                    "payload": responses.useful_types.USEFUL
+                    "payload": responses.useful_types.MAYBE
                 },
             ]
         });
@@ -429,4 +456,13 @@ async function get_entity_questions (entities = []) {
  */
 const first_entity = (nlp, name) => {
     return nlp && nlp.entities && nlp.entities[name] && nlp.entities[name][0];
+}
+
+/**
+ * Proxy to fb send message
+ * @param {number} user_id facebook psid
+ * @param {string} text the message
+ */
+const send_message = (user_id, text) => {
+    return fb_send_message(user_id, {text})
 }
