@@ -10,14 +10,31 @@ const source_model = require('./app/models/sources')
 const api_medic_model = require('./app/models/apimedic');
 const wikipedia_model = require('./app/models/wikipedia');
 const brain = require('./app/brain/brain');
+const slimbot = require('slimbot');
+
+const telegram_bot = new slimbot(config.TELEGRAM_ACCESS_TOKEN);
 const wiki = new wikipedia_model();
 const port = process.env.PORT || config.PORT;
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/pdf', express.static(__dirname + '/tmp'));
 
+// register telegram listeners
+telegram_bot.on('message', message => {
+    // pass in the slimbot object to this
+    const payload = Object.assign({}, message, { telegram_bot });
+    brain.process_input(payload);
+});
+
+telegram_bot.on('callback_query', async (query) => {
+    console.log('[telegram] callback');
+    const { from, data } = query;
+    const payload = Object.assign({}, { from, text: '' }, { postback: data, telegram_bot });
+    brain.process_input(payload);
+});
+
+// facebook webhook
 app.post('/webhook', (req, res) => {
 
     let body = req.body;
@@ -146,4 +163,7 @@ app.get('/apimedic/issues', (req, res) => {
 
 // production server is - https://still-depths-76007.herokuapp.com/webhook
 // local server is -  http://localhost:3124/webhook
-app.listen(port, () => console.log(`App started on port ${port}`));
+telegram_bot.startPolling();
+app.listen(port, () => {
+    console.log(`App started on port ${port} in ${process.env.PORT ? 'production' : 'development'} mode`);
+});
