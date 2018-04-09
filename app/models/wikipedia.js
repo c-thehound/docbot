@@ -34,7 +34,7 @@ class Wikipedia {
                     infoboxes.map(info => {
                         const { data } = info;
                         // wikipedia throws a lot of unexpected object keys
-                        parsed_response.name = data['Name'] ? data['Name'].text : data.name.text || "";
+                        parsed_response.name = data['Name'] ? data['Name'].text : data.text ? data.name.text : "";
                         parsed_response.caption = data['Caption'] ? data['Caption'].text : data.caption ? data.caption.text : "";
                         
                         parsed_response.type = data.field ? data.field.text : "";
