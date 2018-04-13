@@ -80,9 +80,13 @@ const analyze_input = async (user_id, user_obj, input) => {
                         if (question.id === payload.question_id) {
                             let score = 0;
 
-                            if (payload.succeeded === responses.responses_types.YES) {
+                            if (
+                                payload.succeeded === responses.responses_types.YES
+                            ) {
                                 score = 1;
-                            } else if (payload.succeeded === responses.responses_types.NOT_SURE) {
+                            } else if (
+                                payload.succeeded === responses.responses_types.NOT_SURE
+                            ) {
                                 score = .5;
                             }
 
@@ -113,7 +117,7 @@ const analyze_input = async (user_id, user_obj, input) => {
             const {
                 payload
             } = input.quick_reply;
-            console.log(payload);
+            
             if (payload === responses.useful_types.USEFUL) {
                 // great! we can save diagnosis and refresh cache
                 await fb_send_message(user_id, {
@@ -243,7 +247,11 @@ const analyze_input = async (user_id, user_obj, input) => {
             const classifications = await get_classifications(text);
             // choose top 5 entitites from response
             // sortyBy returns an ascending array
-            const top_intents = sortBy(classifications, ['value']).reverse().slice(0, 5);
+            const top_intents = sortBy(
+                classifications, ['value']
+                )
+                .reverse()
+                .slice(0, 5);
 
             const labels = map(top_intents, i => i.label);
             const symptom_questions = await get_entity_questions(labels);
@@ -327,7 +335,8 @@ const analyze_input = async (user_id, user_obj, input) => {
         }
 
     } else {
-        // if here it means we are done with acquiring information and shoud now process requests
+        // if here it means we are done with acquiring information and shoud
+        // now process requests
         // time to score the responses
         const {
             answers
@@ -339,7 +348,10 @@ const analyze_input = async (user_id, user_obj, input) => {
         // just a key value store of entity and score
         // eg { malaria: 6}
         answers.map(answer => {
-            scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
+            scores[answer.entity] =
+                scores[answer.entity] ?
+                (scores[answer.entity] += answer.score) :
+                answer.score;
         });
 
         let sorted_scores = sortBy(
@@ -369,10 +381,12 @@ const analyze_input = async (user_id, user_obj, input) => {
         }
 
         const first = sorted_scores[0];
-        const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data']);
-        let {
-            name
-        } = entity_data;
+        const entity_data = await entity_model.load_entity(
+            'entity',
+            first.entity,
+            ['name', 'images', 'parse_data']
+        );
+        let {name} = entity_data;
         name = unescape(name);
         const images = JSON.parse(entity_data.images);
         const extra = JSON.parse(entity_data.parse_data);

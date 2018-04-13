@@ -3,7 +3,7 @@ const redis_client = require('../utils/get_redis_client');
  * Get saved details from redis cache
  * @param {string} user_id unique user identifier
  */
-const get_data = (user_id) => {
+exports.get_data = (user_id) => {
     console.info('[redis] get data');
     return new Promise((good, bad) => {
         redis_client.get(user_id, (err, reply) => {
@@ -18,7 +18,7 @@ const get_data = (user_id) => {
  * @param {string} user_id unique user identifier
  * @param {JSON} data json encode string to be saved (JSON.stringify(data))
  */
-const save_data = (user_id, data = '') => {
+exports.save_data = (user_id, data = '') => {
     return new Promise((good, bad) => {
         console.info('[redis] save data');
         redis_client.set(user_id, data, (err, reply) => {
@@ -32,7 +32,7 @@ const save_data = (user_id, data = '') => {
  * Reset the cache for this user
  * @param {string} user_id unique user identifier
  */
-const reset_data = (user_id) => {
+exports.reset_data = (user_id) => {
     return new Promise((good, bad) => {
         console.info('[redis] clear data');
         redis_client.set(user_id, '{}', (err, reply) => {
@@ -41,9 +41,3 @@ const reset_data = (user_id) => {
         })
     });
 }
-
-module.exports = {
-    save_data,
-    get_data,
-    reset_data
-};
