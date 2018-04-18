@@ -116,9 +116,7 @@ const analyze_input = async (user_id, user_obj, input) => {
             console.log(payload);
             if (payload === responses.useful_types.USEFUL) {
                 // great! we can save diagnosis and refresh cache
-                await fb_send_message(user_id, {
-                    text: 'Awesome! Glad i helped.'
-                });
+                await send_message(user_id, 'Awesome! Glad i helped.');
 
                 await diagnosis_model.save_diagnosis(user_id, JSON.stringify(user_data.diagnosis));
                 await reset_data(user_id);
@@ -156,48 +154,31 @@ const analyze_input = async (user_id, user_obj, input) => {
 
         if (greetings) {
             // greet the user back
-            // greet user here
-            return fb_send_message(user_id, {
-                "text": sample(responses.greetings)
-            });
+            return send_message(user_id, sample(responses.greetings));
         }
 
         if (matches_command.length > 0) {
             // if i don't have any data on user, ignore the reset command
             if (!user_data.symptom_questions) {
-                await fb_send_message(user_id, {
-                    "text": "No need to reset my session."
-                });
-                await fb_send_message(user_id, {
-                    "text": "Just tell me about your condition."
-                });
+                await send_message(user_id, "No need to reset my session.");
+                await send_message(user_id, "Just tell me about your condition.");
                 return;
             }
 
-            await fb_send_message(user_id, {
-                "text": "Ok. Five me a sec to reset the conversation"
-            });
+            await send_message(user_id, "Ok. Five me a sec to reset the conversation");
             const save_status = await reset_data(user_id);
-            await fb_send_message(user_id, {
-                "text": "Done! Let's start over."
-            });
+            await send_message(user_id, "Done! Let's start over.");
             return;
         }
 
         if (matches_download.length > 0) {
             generate_report(user_id).then(async (filename) => {
-                await fb_send_message(user_id, {
-                    "text": "Please wait while i generate a report"
-                });
+                await send_message(user_id, "Please wait while i generate a report");
                 await fb_upload_file(user_id, `${config.BASE_URL}/pdf/${filename}`, 'file');
-                await fb_send_message(user_id, {
-                    "text": "I've just sent the file. Download to view"
-                });
+                await send_message(user_id, "I've just sent the file. Download to view");
             }).catch(error => {
                 if (error === 'no_data') {
-                    fb_send_message(user_id, {
-                        text: "No medical history found. "
-                    });
+                    send_message(user_id, "No medical history found. ");
                 }
             })
             return;
@@ -208,29 +189,24 @@ const analyze_input = async (user_id, user_obj, input) => {
             is_emoji(text) ||
             (input.sticker_id && input.sticker_id === config.FB_LIKE_BUTTON_ID)
         ) {
-            return fb_send_message(user_id, {
-                "text": sample(responses.emojis)
-            });
+            return send_message(user_id, sample(responses.emojis));
         }
 
         // last chance if we can't understand
         if (!good_sentense) {
-            await fb_send_message(
-                user_id, {
-                    text: capitalize(sample(responses.cant_understand))
-                }
+            await send_message(
+                user_id,
+                capitalize(sample(responses.cant_understand))
             );
 
-            await fb_send_message(
-                user_id, {
-                    text: 'Type in symptom related stuff'
-                }
+            await send_message(
+                user_id,
+                'Type in symptom related stuff'
             );
 
-            await fb_send_message(
-                user_id, {
-                    text: 'Something like "I have a headache" or "i have a fever"'
-                }
+            await send_message(
+                user_id,
+                'Something like "I have a headache" or "i have a fever"'
             );
 
             return;
@@ -336,10 +312,12 @@ const analyze_input = async (user_id, user_obj, input) => {
             answers
         };
         const scores = {};
+        let total_scores = 0;
         // just a key value store of entity and score
         // eg { malaria: 6}
         answers.map(answer => {
             scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
+            total_scores += answer.score;
         });
 
         let sorted_scores = sortBy(
@@ -353,21 +331,21 @@ const analyze_input = async (user_id, user_obj, input) => {
 
         if (sorted_scores.length === 0) {
             // another instance of understood text that sneeked thorugh oour filters
-            await fb_send_message(user_id, {
-                'text': 'It looks like i could not understand your message'
-            });
-
-            await fb_send_message(user_id, {
-                'text': 'Sorry but you have to type something else'
-            });
-
-            await fb_send_message(user_id, {
-                'text': 'If this persists, restart me by texting reboot or /start'
-            });
-
+            await send_message(user_id, 'It looks like i could not understand your message');
+            await send_message(user_id, 'Sorry but you have to type something else');
+            await send_message(user_id, 'If this persists, restart me by texting reboot or /start');
             return;
         }
-
+        
+        if (total_scores === 0) {
+            // this means the user answered no to all questions and the bot may have failed
+            await send_message(user_id, "😭I'm really sorry. I could not diagnose your illness");
+            await send_message(user_id, 'This probably means that you answered no to all questions');
+            await send_message(user_id, 'To help me understand you better, try rephrasing your symptoms');
+            await reset_data(user_id);
+            return;
+        }
+        
         const first = sorted_scores[0];
         const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data']);
         let {
@@ -380,12 +358,8 @@ const analyze_input = async (user_id, user_obj, input) => {
         const chunked_messages = info.split('.');
         const chunked_promises = [];
         const feedback = [
-            fb_send_message(user_id, {
-                "text": "That is enough for now"
-            }),
-            fb_send_message(user_id, {
-                "text": "Let me try and see if i can identify the problem"
-            }),
+            send_message(user_id, "That is enough for now"),
+            send_message(user_id, "Let me try and see if i can identify the problem"),
         ];
 
         diagnosis.illness = name;
@@ -393,23 +367,17 @@ const analyze_input = async (user_id, user_obj, input) => {
 
         await Promise.all(feedback);
         // tell diagnosis
-        await fb_send_message(user_id, {
-            "text": `From my calculations, it is highly possible that you have ${ name }.`
-        });
+        await send_message(user_id, `From my calculations, it is highly possible that you have ${name}.`);
         // maybe tell the user what the disease looks like?
         if (images.length > 0) {
-            await fb_send_message(user_id, {
-                "text": `Here's what ${name} looks like`
-            });
+            await send_message(user_id, `Here's what ${name} looks like`);
             await fb_upload_file(user_id, images[0].url);
         }
         // just in case the description is long chunk it into sentences
         chunked_messages.map(message => {
             if (message.length > 0) {
                 chunked_promises.push(
-                    fb_send_message(user_id, {
-                        "text": message
-                    })
+                    send_message(user_id, message)
                 )
             }
         });

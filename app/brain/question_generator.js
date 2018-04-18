@@ -58,7 +58,11 @@ module.exports = (symptoms = []) => {
     for(let s in symptoms) {
         const symptom = symptoms[s];
         // some sentences justr return 'None', don't bother generating questions
-        if (_.filter(filler_words, w => _.lowerCase(w) === _.lowerCase(symptom)).length < 1) {
+        if (
+            _.filter(
+                filler_words, w => _.lowerCase(w) === _.lowerCase(symptom)
+            ).length < 1
+        ) {
             // to know how to questionize the sentence, we need to
             // get the first word first
             const first_word = _.lowerCase(symptom.split(' ')[0]);

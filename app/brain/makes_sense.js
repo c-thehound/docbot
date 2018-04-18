@@ -10,14 +10,14 @@ module.exports = async (sentence) => {
     const classifications= await get_classifications(sentence);
     const ordered = sortBy(classifications, ['value']);
     /**
-     * The startegy here is find the difference between all the values
+     * The strategy here is find the difference between all the values
      * of the confidence scores and see if the gap is not wide
      * enougth for all the differences "< 1"
      * A good sentense has varying gaps between the scores and will
      * therefore pass this test
      * if a majority of these differences is less than 1
      * then we didn't understand the user's sentence
-     * This may not be accurate most of the time but it lets me weed
+     * This may not be accurate 100% of the time but it lets me weed
      * out useless texts at least
     */
     let counter = 0;

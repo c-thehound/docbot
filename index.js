@@ -163,7 +163,7 @@ app.get('/apimedic/issues', (req, res) => {
 
 // production server is - https://still-depths-76007.herokuapp.com/webhook
 // local server is -  http://localhost:3124/webhook
-telegram_bot.startPolling();
+// telegram_bot.startPolling();
 app.listen(port, () => {
     console.log(`App started on port ${port} in ${process.env.PORT ? 'production' : 'development'} mode`);
 });

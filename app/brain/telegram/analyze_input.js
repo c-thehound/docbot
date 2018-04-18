@@ -1,6 +1,14 @@
-const { save_data, reset_data, get_data} = require('../cache');
+const {
+    save_data,
+    reset_data,
+    get_data
+} = require('../cache');
 const config = require('../../../config')();
-const { classify_text, get_classifications, close_enough } = require('../classify_text');
+const { 
+    classify_text,
+    get_classifications,
+    close_enough
+} = require('../classify_text');
 const greetings = require('../../intents/greetings');
 const responses = require('../responses');
 const generate_question = require('../question_generator');
@@ -265,7 +273,7 @@ const analyze_input = async (user_obj, input) => {
         if (sorted_scores.length === 0) {
             // another instance of understood text that sneeked thorugh oour filtersconst
             await bot.sendMessage(id, 'It looks like i could not understand your message.');
-            await bot.sendMessage(id, 'If this persists, restart me by texting reboot or start over');
+            await bot.sendMessage(id, 'If this persists, restart me by texting "reboot" or "start over"');
 
             return;
         }
