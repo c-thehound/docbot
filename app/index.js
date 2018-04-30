@@ -30,9 +30,9 @@ module.exports = (config) => {
     });
     // telegram webhook
     if (config.MODE === 'production') {
-        slimbot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
+        telegram_bot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
         // // Get webhook status
-        slimbot.getWebhookInfo();
+        telegram_bot.getWebhookInfo();
     }
     app.post('/telegram/webhook', (req, res) => {
         let body = req.body;
