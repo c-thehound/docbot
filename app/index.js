@@ -158,6 +158,7 @@ module.exports = (config) => {
 
     // production server is - https://still-depths-76007.herokuapp.com/webhook
     // local server is -  http://localhost:3124/webhook
+    // for telegram just npm start and search for @virtual_doc_bot on the app
     telegram_bot.startPolling();
     app.listen(port, () => {
         console.log(`App started on port ${port} in ${process.env.PORT ? 'production' : 'development'} mode`);
