@@ -34,9 +34,19 @@ module.exports = (config) => {
         // // Get webhook status
         telegram_bot.getWebhookInfo();
     }
+    // for local testing
+    telegram_bot.setWebhook({ url: 'https://61584b71.ngrok.io/telegram/webhook'});
+    telegram_bot.getWebhookInfo().then(e => {
+        console.log(e);
+    });
+    
     app.post('/telegram/webhook', (req, res) => {
-        let body = req.body;
-        console.log('telegram', body);
+        let update = req.body;
+        console.log(update);
+        if (update.message) {
+            const payload = Object.assign({}, update.message, { telegram_bot });
+            brain.process_input(payload);
+        }
     });
     // facebook webhook
     app.post('/webhook', (req, res) => {
