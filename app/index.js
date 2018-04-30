@@ -30,15 +30,15 @@ module.exports = (config) => {
     });
     // telegram webhook
     if (config.MODE === 'production') {
-        telegram_bot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
-        // // Get webhook status
-        telegram_bot.getWebhookInfo();
+        // telegram_bot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
+        // // // Get webhook status
+        // telegram_bot.getWebhookInfo();
     }
     // for local testing
-    telegram_bot.setWebhook({ url: 'https://61584b71.ngrok.io/telegram/webhook'});
-    telegram_bot.getWebhookInfo().then(e => {
-        console.log(e);
-    });
+    // telegram_bot.setWebhook({ url: 'https://61584b71.ngrok.io/telegram/webhook'});
+    // telegram_bot.getWebhookInfo().then(e => {
+    //     console.log(e);
+    // });
     
     app.post('/telegram/webhook', (req, res) => {
         let update = req.body;
