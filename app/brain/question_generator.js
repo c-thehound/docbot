@@ -65,9 +65,10 @@ module.exports = (symptoms = []) => {
         ) {
             // to know how to questionize the sentence, we need to
             // get the first word first
-            const first_word = _.lowerCase(symptom.split(' ')[0]);
+            let symptom_list = symptom.split(' ');
+            const first_word = _.lowerCase(symptom_list[0]);
             // take the rest of the words
-            const rest_words = _.lowerCase(symptom.split(' ').slice(1).join(' ')); // is there a better way to do this?
+            const rest_words = _.lowerCase(symptom_list.slice(1).join(' ')); // is there a better way to do this?
 
             // classify the word
             const words = new pos.Lexer().lex(first_word);

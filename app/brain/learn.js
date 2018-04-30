@@ -20,11 +20,11 @@ async function learn () {
             parse_data
         } = response;
 
-        if (name && name.length > 0) classifier.addDocument(name, entity);
-        if (caption && caption.length > 0) classifier.addDocument(caption, entity);
-        if (type && type.length > 0) classifier.addDocument(type, entity);
-        if (causes && causes.desc) classifier.addDocument(causes.desc, entity);
-        if (response.symptoms) response.symptoms.map(symptom => classifier.addDocument(symptom, entity));
+        if (name && name.length > 0)        classifier.addDocument(name, entity);
+        if (caption && caption.length > 0)  classifier.addDocument(caption, entity);
+        if (type && type.length > 0)        classifier.addDocument(type, entity);
+        if (causes && causes.desc)          classifier.addDocument(causes.desc, entity);
+        if (response.symptoms)              response.symptoms.map(symptom => classifier.addDocument(symptom, entity));
 
         if (response.prevention) {
             const { prevention } = response;
