@@ -1,7 +1,8 @@
 const for_all = {
     PORT: 3128,
+    MODE: 'development',
     // this changes very often
-    BASE_URL: 'https://c125e83f.ngrok.io ',
+    BASE_URL: 'https://c125e83f.ngrok.io',
     FB_HOME_SCREEN_SET: false,
     FB_LIKE_BUTTON_ID: 369239263222822,
     TELEGRAM_ACCESS_TOKEN: '566379095:AAGaLWEigdnylnBFHpRydoV3IZeZdxOfBNc',
@@ -17,7 +18,8 @@ module.exports = () => {
                 REDIS_PORT: rtg.port,
                 BASE_URL: 'https://still-depths-76007.herokuapp.com',
                 REDIS_HOST_NAME: rtg.hostname,
-                AUTH: rtg.auth
+                AUTH: rtg.auth,
+                MODE: 'production'
             });
 
             break;

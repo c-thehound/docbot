@@ -28,7 +28,16 @@ module.exports = (config) => {
         const payload = Object.assign({}, { from, text: '' }, { postback: data, telegram_bot });
         brain.process_input(payload);
     });
-
+    // telegram webhook
+    if (config.MODE === 'production') {
+        slimbot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
+        // // Get webhook status
+        slimbot.getWebhookInfo();
+    }
+    app.post('/telegram/webhook', (req, res) => {
+        let body = req.body;
+        console.log('telegram', body);
+    });
     // facebook webhook
     app.post('/webhook', (req, res) => {
 
@@ -159,7 +168,7 @@ module.exports = (config) => {
     // production server is - https://still-depths-76007.herokuapp.com/webhook
     // local server is -  http://localhost:3124/webhook
     // for telegram just npm start and search for @virtual_doc_bot on the app
-    telegram_bot.startPolling();
+    // telegram_bot.startPolling();
     app.listen(port, () => {
         console.log(`App started on port ${port} in ${process.env.PORT ? 'production' : 'development'} mode`);
     });
