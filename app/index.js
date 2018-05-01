@@ -15,38 +15,29 @@ app.use('/pdf', express.static(__dirname + '/tmp'));
 module.exports = (config) => {
     const port = process.env.PORT || config.PORT;
     const telegram_bot = new slimbot(config.TELEGRAM_ACCESS_TOKEN);
-    // register telegram listeners
-    telegram_bot.on('message', message => {
-        // pass in the slimbot object to this
-        const payload = Object.assign({}, message, { telegram_bot });
-        brain.process_input(payload);
-    });
-
-    telegram_bot.on('callback_query', async (query) => {
-        console.log('[telegram] callback');
-        const { from, data } = query;
-        const payload = Object.assign({}, { from, text: '' }, { postback: data, telegram_bot });
-        brain.process_input(payload);
-    });
     // telegram webhook
     if (config.MODE === 'production') {
-        // telegram_bot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
-        // // // Get webhook status
-        // telegram_bot.getWebhookInfo();
+        telegram_bot.setWebhook({ url: config.BASE_URL + '/telegram/webhook' });
     }
     // for local testing
-    // telegram_bot.setWebhook({ url: 'https://61584b71.ngrok.io/telegram/webhook'});
+    // telegram_bot.setWebhook({ url: 'https://5ced0c7f.ngrok.io/telegram/webhook'});
     // telegram_bot.getWebhookInfo().then(e => {
     //     console.log(e);
     // });
     
     app.post('/telegram/webhook', (req, res) => {
         let update = req.body;
-        console.log(update);
+
         if (update.message) {
             const payload = Object.assign({}, update.message, { telegram_bot });
             brain.process_input(payload);
+        } else if (update.callback_query) {
+            const { from, data } = update.callback_query;
+            const payload = Object.assign({}, { from, text: '' }, { postback: data, telegram_bot });
+            brain.process_input(payload);
         }
+        // return 200 status to all requests to confirm receiving
+        res.status(200).send('EVENT_RECEIVED');
     });
     // facebook webhook
     app.post('/webhook', (req, res) => {

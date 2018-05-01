@@ -29,9 +29,8 @@ module.exports = async (sentence) => {
         }
     }
 
-    return parseInt(
+    return (
         // this is just a percentage calculation
-        (counter / ordered.length) * 100,
-        10
+        (counter / ordered.length) * 100
     ) < 80;
 }
