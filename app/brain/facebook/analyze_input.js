@@ -33,6 +33,7 @@ const fb_send_message = require('./send_message');
 const fb_upload_file = require('./upload_file');
 const fb_update_home_screen = require('./homepage');
 const fb_profile = require('./profile');
+const constants = require('../../../constants');
 
 /**
  * Analyzes user's input to determine correct response

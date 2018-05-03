@@ -29,9 +29,13 @@ module.exports = (config) => {
         let update = req.body;
 
         if (update.message) {
+            // for handling essenges sent by the user
+            // the telegram handler only uses one instance of slimbot so the easiest
+            // idea is to send it the telegram instance here
             const payload = Object.assign({}, update.message, { telegram_bot });
             brain.process_input(payload);
         } else if (update.callback_query) {
+            // for handling postbacks from the user
             const { from, data } = update.callback_query;
             const payload = Object.assign({}, { from, text: '' }, { postback: data, telegram_bot });
             brain.process_input(payload);
