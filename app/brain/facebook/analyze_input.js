@@ -330,6 +330,7 @@ const analyze_input = async (user_id, user_obj, input) => {
                 scores[answer.entity] ?
                 (scores[answer.entity] += answer.score) :
                 answer.score;
+                total_scores += answer.score;
         });
 
         let sorted_scores = sortBy(
