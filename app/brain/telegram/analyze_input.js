@@ -244,7 +244,6 @@ const analyze_input = async (user_obj, input) => {
              * that have the last words more than once
              * example ['Do you have a fever?', 'Any fever?'] - you remove one of these
              */
-            let unique_last_words = uniq(last_words);
             let last_words_used = {};
             let unique_questions = ui_questions.filter(que => {
                 let tk = que.question.split(' ');
