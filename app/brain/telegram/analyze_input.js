@@ -144,7 +144,7 @@ const analyze_input = async (user_obj, input) => {
             return;
         }
 
-        if (postback === responses.useful_types.NO) {
+        if (postback === responses.useful_types.NOT_USEFUL) {
             await bot.sendMessage(id, `Too bad, i'll try to do better next time`);
             return;
         }
