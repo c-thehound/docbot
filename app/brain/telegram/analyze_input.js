@@ -212,7 +212,7 @@ const analyze_input = async (user_obj, input) => {
             // don't repeat the same questions
             const unasked = filter(questions, q => {
                 let ent = entity.split('_');
-                return !q.asked && q.indexOf(ent[0]) === -1 && q.indexOf(ent[0]) === -1
+                return !q.asked && q.question.indexOf(ent[0]) === -1 && q.question.indexOf(ent[0]) === -1
             });
 
             if (unasked.length > 0) {
