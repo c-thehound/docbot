@@ -124,7 +124,7 @@ const analyze_input = async (user_obj, input) => {
             await bot.sendMessage(id, 'Awesome! Glad i helped.');
             // i think it's time for ways of treatment
             if (user_data.diagnosis) {
-                let { medication } = user_data.diagnosis;
+                let medication = JSON.parse(user_data.diagnosis.medication);
                 console.log(medication, typeof medication);
                 await bot.sendMessage(id, "Here's a recommendation of treatment");
                 if (Array.isArray(medication)) {
