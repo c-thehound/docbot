@@ -285,7 +285,9 @@ const analyze_input = async (user_obj, input) => {
         // just a key value store of entity and score
         // eg { malaria: 6}
         answers.map(answer => {
-            scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
+            if (answer && answer.entity && answer.score) {
+                scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
+            }
         });
 
         let sorted_scores = sortBy(
