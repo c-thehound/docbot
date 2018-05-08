@@ -244,26 +244,26 @@ const analyze_input = async (user_obj, input) => {
              * that have the last words more than once
              * example ['Do you have a fever?', 'Any fever?'] - you remove one of these
              */
-            let last_words = ui_questions.map(que => {
-                let word_tokens = que.question.split(' ');
-                return word_tokens[word_tokens.length - 1];
-            });
-
             let unique_last_words = uniq(last_words);
             let last_words_used = {};
-            let unique_question = ui_questions.filter(que => {
+            let unique_questions = ui_questions.filter(que => {
                 let tk = que.question.split(' ');
                 let word = tk[tk.length - 1];
 
-                if (last_words_used[word]) {
+                if (
+                    last_words_used[word] ||
+                    last_words_used[word + 'ing'] ||
+                    last_words_used[word + 'ion'] ||
+                    last_words_used[word + 'ness']
+                ) {
                     return false;
                 }
-                
+
                 last_words_used[word] = true;
                 return true;
             });
-            console.log(unique_question);
-            data.cached_questions = ui_questions;
+
+            data.cached_questions = unique_questions;
         }
 
         const save = await save_data(id, JSON.stringify(data));
