@@ -215,7 +215,7 @@ const analyze_input = async (user_obj, input) => {
                 let ent = entity.split('_');
                 return !q.asked &&
                     q.question.indexOf(ent[0]) === -1 &&
-                    q.question.indexOf(ent[0]) === -1 &&
+                    q.question.indexOf(ent[1]) === -1 &&
                     q.question.indexOf(text.toLocaleLowerCase()) === -1
             });
 
@@ -316,6 +316,7 @@ const analyze_input = async (user_obj, input) => {
             answers
         };
         const scores = {};
+        let total_scores = 0;
         // just a key value store of entity and score
         // eg { malaria: 6}
         answers.map(answer => {

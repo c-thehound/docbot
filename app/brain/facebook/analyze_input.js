@@ -269,10 +269,18 @@ const analyze_input = async (user_id, user_obj, input) => {
                 // don't repeat the same questions
                 const unasked = filter(questions, q => {
                     let ent = entity.split('_');
+                    let text_tk = text.split(' ');
+                    let ques_tk = q.question.split(' ');
+                    let q_word = ques_tk[tk.length - 1];
+                    let text_in_question = text_tk.filter(w => {
+                        return q_word.indexOf(w.toLocaleLowerCase()) !== -1;
+                    });
+                    console.log(text_in_question, q_word, text_tk);
                     return !q.asked &&
                         q.question.indexOf(ent[0]) === -1 &&
-                        q.question.indexOf(ent[0]) === -1 &&
-                        q.question.indexOf(text.toLocaleLowerCase()) === -1
+                        q.question.indexOf(ent[1]) === -1 &&
+                        q.question.indexOf(text.toLocaleLowerCase()) === -1 &&
+                        text_in_question.length === 0
                 });
 
                 if (unasked.length > 0) {
