@@ -19,6 +19,7 @@ const capitalize = require('lodash/capitalize');
 const find = require('lodash/find');
 const forEach = require('lodash/forEach');
 const chain = require('lodash/chain');
+const uniq = require('lodash/uniq');
 const sample = require('lodash/sample');
 const sampleSize = require('lodash/sampleSize');
 const assign = require('lodash/assign');
@@ -123,8 +124,33 @@ const analyze_input = async (user_id, user_obj, input) => {
                 // great! we can save diagnosis and refresh cache
                 await send_message(user_id, 'Awesome! Glad i helped.');
 
+                // i think it's time for ways of treatment
+                if (user_data.diagnosis) {
+                    let medication = JSON.parse(user_data.diagnosis.medication);
+                    await send_message(user_id, "Here's a recommendation of treatment");
+                    if (Array.isArray(medication)) {
+                        let med = medication.slice(0, 2);
+                        med.map(async (sentence) => {
+                            await send_message(user_id, sentence);
+                        });
+                    } else {
+                        await send_message(user_id, medication.desc);
+                    }
+                }
+
                 await diagnosis_model.save_diagnosis(user_id, JSON.stringify(user_data.diagnosis));
                 await reset_data(user_id);
+                return;
+            }
+
+            if (payload === responses.useful_types.NO) {
+                await send_message(user_id, `Too bad, i'll try to do better next time`);
+                return;
+            }
+
+            if (payload === responses.useful_types.MAYBE) {
+                await send_message(user_id, 'I may have not understood your text correctly.');
+                await send_message(user_id, 'Try restarting me by typing "boot" or "start over" and then type a more detailed symptom');
                 return;
             }
             // after user presses let's go!
@@ -241,7 +267,13 @@ const analyze_input = async (user_id, user_obj, input) => {
                     questions
                 } = entity_object;
                 // don't repeat the same questions
-                const unasked = filter(questions, q => !q.asked);
+                const unasked = filter(questions, q => {
+                    let ent = entity.split('_');
+                    return !q.asked &&
+                        q.question.indexOf(ent[0]) === -1 &&
+                        q.question.indexOf(ent[0]) === -1 &&
+                        q.question.indexOf(text.toLocaleLowerCase()) === -1
+                });
 
                 if (unasked.length > 0) {
                     // take 2 questions
@@ -260,7 +292,34 @@ const analyze_input = async (user_id, user_obj, input) => {
             });
 
             if (!user_data.cached_questions) {
-                data.cached_questions = ui_questions;
+             /**
+              * This is part of the process of trying to filter out duplicate
+              * questions.
+              * In this case we check for the last words, whcih normally contain the symptoms
+              * as used in question_generator module and the remove any questions
+              * that have the last words more than once
+              * example ['Do you have a fever?', 'Any fever?'] - you remove one of these
+              */
+                let last_words_used = {};
+                let unique_questions = ui_questions.filter(que => {
+                    let tk = que.question.split(' ');
+                    let word = tk[tk.length - 1];
+                    // remove last ? character
+                    word = word.substring(0, word.length - 1);
+                    if (
+                        last_words_used[word] ||
+                        last_words_used[word + 'ing'] ||
+                        last_words_used[word + 'ion'] ||
+                        last_words_used[word + 'ness']
+                    ) {
+                        return false;
+                    }
+
+                    last_words_used[word] = true;
+                    return true;
+                });
+
+                data.cached_questions = unique_questions;
             }
 
             const save = await save_data(user_id, JSON.stringify(data));
@@ -326,11 +385,10 @@ const analyze_input = async (user_id, user_obj, input) => {
         // just a key value store of entity and score
         // eg { malaria: 6}
         answers.map(answer => {
-            scores[answer.entity] =
-                scores[answer.entity] ?
-                (scores[answer.entity] += answer.score) :
-                answer.score;
+            if (answer && answer.entity && answer.score) {
+                scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
                 total_scores += answer.score;
+            }
         });
 
         let sorted_scores = sortBy(
@@ -360,13 +418,9 @@ const analyze_input = async (user_id, user_obj, input) => {
         }
         
         const first = sorted_scores[0];
-        const entity_data = await entity_model.load_entity(
-            'entity',
-            first.entity,
-            ['name', 'images', 'parse_data']
-        );
-        let {name} = entity_data;
-        name = unescape(name);
+        const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data', 'medication']);
+        let { name, medication } = entity_data;
+        name = unescape(name) || capitalize(first.entity.split('_'));
         const images = JSON.parse(entity_data.images);
         const extra = JSON.parse(entity_data.parse_data);
         const info = extra[0].text;
@@ -378,7 +432,8 @@ const analyze_input = async (user_id, user_obj, input) => {
         ];
 
         diagnosis.illness = name;
-        diagnosis.info = info
+        diagnosis.info = info;
+        diagnosis.medication = medication;
 
         await Promise.all(feedback);
         // tell diagnosis

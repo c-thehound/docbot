@@ -321,6 +321,7 @@ const analyze_input = async (user_obj, input) => {
         answers.map(answer => {
             if (answer && answer.entity && answer.score) {
                 scores[answer.entity] = scores[answer.entity] ? (scores[answer.entity] += answer.score) : answer.score;
+                total_scores += answer.score;
             }
         });
 
@@ -339,8 +340,16 @@ const analyze_input = async (user_obj, input) => {
             return;
         }
 
+        if (total_scores === 0) {
+            // this means the user answered no to all questions and the bot may have failed
+            await send_message(user_id, "😭I'm really sorry. I could not diagnose your illness");
+            await send_message(user_id, 'This probably means that you answered no to all questions');
+            await send_message(user_id, 'To help me understand you better, try rephrasing your symptoms');
+            await reset_data(user_id);
+            return;
+        }
+
         const first = sorted_scores[0];
-        console.log(first, sorted_scores);
         const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data', 'medication']);
         let { name, medication } = entity_data;
         name = unescape(name) || capitalize(first.entity.split('_'));
