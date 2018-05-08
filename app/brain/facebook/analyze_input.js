@@ -271,7 +271,7 @@ const analyze_input = async (user_id, user_obj, input) => {
                     let ent = entity.split('_');
                     let text_tk = text.split(' ');
                     let ques_tk = q.question.split(' ');
-                    let q_word = ques_tk[tk.length - 1];
+                    let q_word = ques_tk[ques_tk.length - 1];
                     let text_in_question = text_tk.filter(w => {
                         return q_word.indexOf(w.toLocaleLowerCase()) !== -1;
                     });
