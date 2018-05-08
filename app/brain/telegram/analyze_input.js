@@ -123,17 +123,17 @@ const analyze_input = async (user_obj, input) => {
             // great! we can save diagnosis and refresh cache
             await bot.sendMessage(id, 'Awesome! Glad i helped.');
             // i think it's time for ways of treatment
-            console.log(user_data);
-            if (user_data.medication) {
-                console.log(user_data.medication);
+            if (user_data.diagnosis) {
+                let { medication } = user_data.diagnosis;
+                console.log(medication, typeof medication);
                 await bot.sendMessage(id, "Here's a recommendation of treatment");
-                if (Array.isArray(user_data.medication)) {
-                    let med = user_data.medication.slice(0, 2);
+                if (Array.isArray(medication)) {
+                    let med = medication.slice(0, 2);
                     med.map(async (sentence) => {
                         await bot.sendMessage(id, sentence);
                     });
                 } else {
-                    await bot.sendMessage(id, user_data.medication.desc);
+                    await bot.sendMessage(id, medication.desc);
                 }
             }
             //
