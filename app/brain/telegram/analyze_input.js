@@ -250,10 +250,17 @@ const analyze_input = async (user_obj, input) => {
             });
 
             let unique_last_words = uniq(last_words);
+            let last_words_used = {};
             let unique_question = ui_questions.filter(que => {
                 let tk = que.question.split(' ');
-                console.log(unique_last_words, tk[tk.length - 1]);
-                return unique_last_words.includes(tk[tk.length - 1]);
+                let word = tk[tk.length - 1];
+
+                if (last_words_used[word]) {
+                    return false;
+                }
+                
+                last_words_used[word] = true;
+                return true;
             });
             console.log(unique_question);
             data.cached_questions = ui_questions;
