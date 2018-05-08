@@ -238,6 +238,7 @@ const analyze_input = async (user_obj, input) => {
         if (!user_data.cached_questions) {
             let last_words = ui_questions.map(que => {
                 let word_tokens = que.question.split(' ');
+                console.log(que.question);
                 return word_tokens[word_tokens.length - 1];
             });
             console.log('last words:', last_words, uniq(last_words));
