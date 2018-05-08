@@ -248,7 +248,8 @@ const analyze_input = async (user_obj, input) => {
             let unique_questions = ui_questions.filter(que => {
                 let tk = que.question.split(' ');
                 let word = tk[tk.length - 1];
-
+                // remove last ? character
+                word = word.substring(0, word.length - 1);
                 if (
                     last_words_used[word] ||
                     last_words_used[word + 'ing'] ||
