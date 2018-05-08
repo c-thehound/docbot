@@ -205,12 +205,15 @@ const analyze_input = async (user_obj, input) => {
         const labels = map(top_intents, i => i.label);
         const symptom_questions = await get_entity_questions(labels);
         // a group of questions to ask user
-        const ui_questions = [];
+        let ui_questions = [];
 
         forEach(symptom_questions, (entity_object) => {
             const { entity, questions } = entity_object;
             // don't repeat the same questions
-            const unasked = filter(questions, q => !q.asked);
+            const unasked = filter(questions, q => {
+                let ent = entity.split('_');
+                return !q.asked && q.indexOf(ent[0]) === -1 && q.indexOf(ent[0]) === -1
+            });
 
             if (unasked.length > 0) {
                 // take 2 questions
