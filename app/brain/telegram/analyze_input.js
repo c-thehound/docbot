@@ -125,7 +125,6 @@ const analyze_input = async (user_obj, input) => {
             // i think it's time for ways of treatment
             if (user_data.diagnosis) {
                 let medication = JSON.parse(user_data.diagnosis.medication);
-                console.log(medication, typeof medication);
                 await bot.sendMessage(id, "Here's a recommendation of treatment");
                 if (Array.isArray(medication)) {
                     let med = medication.slice(0, 2);
@@ -305,6 +304,7 @@ const analyze_input = async (user_obj, input) => {
         }
 
         const first = sorted_scores[0];
+        console.log(first, sorted_scores);
         const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data', 'medication']);
         let { name, medication } = entity_data;
         name = unescape(name) || capitalize(first.entity.split('_'));
