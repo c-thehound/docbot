@@ -236,6 +236,14 @@ const analyze_input = async (user_obj, input) => {
         });
 
         if (!user_data.cached_questions) {
+            /**
+             * This is part of the process of trying to filter out duplicate
+             * questions.
+             * In this case we check for the last words, whcih normally contain the symptoms
+             * as used in question_generator module and the remove any questions
+             * that have the last words more than once
+             * example ['Do you have a fever?', 'Any fever?'] - you remove one of these
+             */
             let last_words = ui_questions.map(que => {
                 let word_tokens = que.question.split(' ');
                 return word_tokens[word_tokens.length - 1];
@@ -244,6 +252,7 @@ const analyze_input = async (user_obj, input) => {
             let unique_last_words = uniq(last_words);
             let unique_question = ui_questions.filter(que => {
                 let tk = que.question.split(' ');
+                console.log(unique_last_words, tk[tk.length - 1]);
                 return unique_last_words.includes(tk[tk.length - 1]);
             });
             console.log(unique_question);
