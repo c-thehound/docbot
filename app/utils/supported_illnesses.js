@@ -12,7 +12,7 @@ module.exports = [
     'acne',
     'chicken pox',
     'chlamydia',
-    'cold',
+    // 'cold',
     'concussion',
     'constipation',
     'diarrhea',

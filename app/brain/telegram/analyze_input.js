@@ -89,6 +89,7 @@ const analyze_input = async (user_obj, input) => {
             await bot.sendMessage(id, "Please wait while i generate a report");
             await bot.sendDocument(id, `${config.BASE_URL}/pdf/${filename}`);
             await bot.sendMessage(id, "I've just sent the file. Download to view");
+            await bot.sendMessage(id, `If you can't see the file, click here to download ${config.BASE_URL}/pdf/${filename}`);
         }).catch(error => {
             console.log(error);
             if (error === 'no_data') {
@@ -121,9 +122,33 @@ const analyze_input = async (user_obj, input) => {
         if (postback === responses.useful_types.USEFUL) {
             // great! we can save diagnosis and refresh cache
             await bot.sendMessage(id, 'Awesome! Glad i helped.');
-
+            // i think it's time for ways of treatment
+            if (user_data.medication) {
+                console.log(user_data.medication);
+                await bot.sendMessage(id, "Here's a recommendation of treatment");
+                if (Array.isArray(user_data.medication)) {
+                    let med = user_data.medication.slice(0, 2);
+                    med.map(async (sentence) => {
+                        await bot.sendMessage(id, sentence);
+                    });
+                } else {
+                    await bot.sendMessage(id, user_data.medication.desc);
+                }
+            }
+            //
             await diagnosis_model.save_diagnosis(id, JSON.stringify(user_data.diagnosis));
             await reset_data(id);
+            return;
+        }
+
+        if (postback === responses.useful_types.NO) {
+            await bot.sendMessage(id, `Too bad, i'll try to do better next time`);
+            return;
+        }
+
+        if (postback === responses.useful_types.MAYBE) {
+            await bot.sendMessage(id, 'I may have not understood your text correctly.');
+            await bot.sendMessage(id, 'Try restarting me by typing "boot" or "start over" and then type a more detailed symptom');
             return;
         }
 
@@ -279,9 +304,9 @@ const analyze_input = async (user_obj, input) => {
         }
 
         const first = sorted_scores[0];
-        const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data']);
-        let { name } = entity_data;
-        name = unescape(name);
+        const entity_data = await entity_model.load_entity('entity', first.entity, ['name', 'images', 'parse_data', 'medication']);
+        let { name, medication } = entity_data;
+        name = unescape(name) || capitalize(first.entity.split('_'));
         const images = JSON.parse(entity_data.images);
         const extra = JSON.parse(entity_data.parse_data);
         const info = extra[0].text;
@@ -293,7 +318,8 @@ const analyze_input = async (user_obj, input) => {
         ];
 
         diagnosis.illness = name;
-        diagnosis.info = info
+        diagnosis.info = info;
+        diagnosis.medication = medication;
 
         await Promise.all(feedback);
         // tell diagnosis
