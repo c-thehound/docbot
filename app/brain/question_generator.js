@@ -120,7 +120,7 @@ module.exports = (symptoms = []) => {
                     break;
             };
             // the full question in all its glory
-            const question = _.upperFirst(`${sample_q} ${word.toLocaleLowerCase()} ${rest_words || ''}?`);
+            const question = _.upperFirst(`${trim(sample_q)} ${trim(word.toLocaleLowerCase())} ${trim(rest_words) || ''}?`);
             questions.push(question);
         }
     }
