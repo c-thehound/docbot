@@ -19,6 +19,7 @@ const capitalize = require('lodash/capitalize');
 const find = require('lodash/find');
 const forEach = require('lodash/forEach');
 const chain = require('lodash/chain');
+const uniq = require('lodash/uniq');
 const sample = require('lodash/sample');
 const sampleSize = require('lodash/sampleSize');
 const assign = require('lodash/assign');
@@ -235,6 +236,11 @@ const analyze_input = async (user_obj, input) => {
         });
 
         if (!user_data.cached_questions) {
+            let last_words = ui_questions.map(que => {
+                let word_tokens = que.question.split(' ');
+                return word_tokens[word_tokens.length - 1];
+            });
+            console.log('last words:', last_words, uniq(last_words));
             data.cached_questions = ui_questions;
         }
 
@@ -242,7 +248,7 @@ const analyze_input = async (user_obj, input) => {
         user_data = data;
     }
 
-    const { symptom_questions, classifications, cached_questions } = user_data;
+    let { symptom_questions, classifications, cached_questions } = user_data;
     // select the top most question and ask user
     const question = cached_questions.shift();
     let response = null;
