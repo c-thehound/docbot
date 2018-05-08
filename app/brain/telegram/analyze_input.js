@@ -30,6 +30,7 @@ const commands = require('../../entities/commands');
 const makes_sense = require('../makes_sense');
 const generate_report = require('../../utils/generate_report');
 const get_entity_questions = require('../get_entity_questions');
+const { remove_stop_words } = require('../../utils/stopwords');
 // local slimbot instance
 let bot = {};
 /**
@@ -39,7 +40,8 @@ let bot = {};
  * @param {string | object} input - what the user typed in 
  */
 const analyze_input = async (user_obj, input) => {
-    const { from: { id, first_name, last_name }, text, telegram_bot, postback } = input;
+    let { from: { id, first_name, last_name }, text, telegram_bot, postback } = input;
+    text = remove_stop_words(text);
     let user_data = JSON.parse(user_obj);
     bot = telegram_bot;
     const start_command = find(commands, c => c.name === 'restart');
@@ -209,14 +211,25 @@ const analyze_input = async (user_obj, input) => {
         let ui_questions = [];
 
         forEach(symptom_questions, (entity_object) => {
-            const { entity, questions } = entity_object;
+            const {
+                entity,
+                questions
+            } = entity_object;
             // don't repeat the same questions
             const unasked = filter(questions, q => {
                 let ent = entity.split('_');
+                let text_tk = text.split(' ');
+                let ques_tk = q.question.split(' ');
+                let q_word = ques_tk[ques_tk.length - 1];
+                let text_in_question = text_tk.filter(w => {
+                    return q_word.indexOf(w.toLocaleLowerCase()) !== -1;
+                });
+
                 return !q.asked &&
                     q.question.indexOf(ent[0]) === -1 &&
                     q.question.indexOf(ent[1]) === -1 &&
-                    q.question.indexOf(text.toLocaleLowerCase()) === -1
+                    q.question.indexOf(text.toLocaleLowerCase()) === -1 &&
+                    text_in_question.length === 0
             });
 
             if (unasked.length > 0) {

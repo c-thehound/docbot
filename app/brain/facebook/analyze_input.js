@@ -35,6 +35,7 @@ const fb_upload_file = require('./upload_file');
 const fb_update_home_screen = require('./homepage');
 const fb_profile = require('./profile');
 const constants = require('../../../constants');
+const { remove_stop_words } = require('../../utils/stopwords');
 
 /**
  * Analyzes user's input to determine correct response
@@ -143,13 +144,13 @@ const analyze_input = async (user_id, user_obj, input) => {
                 return;
             }
 
-            if (payload === responses.useful_types.NO) {
+            if (payload === responses.useful_types.NOT_USEFUL) {
                 await send_message(user_id, `Too bad, i'll try to do better next time`);
                 return;
             }
 
             if (payload === responses.useful_types.MAYBE) {
-                await send_message(user_id, 'I may have not understood your text correctly.');
+                await send_message(user_id, 'Sorry for that. I may have not understood your text correctly.');
                 await send_message(user_id, 'Try restarting me by typing "boot" or "start over" and then type a more detailed symptom');
                 return;
             }
@@ -164,10 +165,11 @@ const analyze_input = async (user_id, user_obj, input) => {
 
     } else {
         // respond to user answers
-        const {
+        let {
             text,
             nlp
         } = input;
+        text = remove_stop_words(text);
         const start_command = find(commands, c => c.name === 'restart');
         const download_command = find(commands, c => c.name === 'download_report');
         // recognise basic text meanings such as thank you messages
@@ -275,7 +277,7 @@ const analyze_input = async (user_id, user_obj, input) => {
                     let text_in_question = text_tk.filter(w => {
                         return q_word.indexOf(w.toLocaleLowerCase()) !== -1;
                     });
-                    console.log(text_in_question, q_word, text_tk);
+                    
                     return !q.asked &&
                         q.question.indexOf(ent[0]) === -1 &&
                         q.question.indexOf(ent[1]) === -1 &&
