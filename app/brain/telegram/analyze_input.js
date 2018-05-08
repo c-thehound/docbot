@@ -243,7 +243,7 @@ const analyze_input = async (user_obj, input) => {
 
             let unique_last_words = uniq(last_words);
             let unique_question = ui_questions.filter(que => {
-                let tk = que.split(' ');
+                let tk = que.question.split(' ');
                 return unique_last_words.includes(tk[tk.length - 1]);
             });
             console.log(unique_question);
