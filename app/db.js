@@ -1,31 +1,31 @@
 /**
  * Database configurations
  * I use knex for its awesome querybuilder
- * @author pozy<masikapolycarp@gmail.com>
+ * @author Polycarp Masika <browncastin@gmail.com>
  */
-const url = require('url');
+const url = require("url");
 
-if (process.env.NODE_ENV === 'production') {
-    const config = url.parse(process.env.CLEARDB_DATABASE_URL);
-    const [ user, password ] = config.auth.split(':');
-    const db_settings = {
-        client: 'mysql',
-        connection: {
-            host: config.host,
-            user: user,
-            password: password,
-            database: config.pathname.slice(1)
-        }
-    };
-    module.exports = require('knex')(db_settings);
+if (process.env.NODE_ENV === "production") {
+	const config = url.parse(process.env.CLEARDB_DATABASE_URL);
+	const [user, password] = config.auth.split(":");
+	const db_settings = {
+		client: "mysql",
+		connection: {
+			host: config.host,
+			user: user,
+			password: password,
+			database: config.pathname.slice(1)
+		}
+	};
+	module.exports = require("knex")(db_settings);
 } else {
-    module.exports = require('knex')({
-        client: 'mysql',
-        connection: {
-            host: '127.0.0.1',
-            user: 'root',
-            password: '',
-            database: 'docbot'
-        }
-    });
+	module.exports = require("knex")({
+		client: "mysql",
+		connection: {
+			host: "127.0.0.1",
+			user: "root",
+			password: "",
+			database: "docbot"
+		}
+	});
 }
